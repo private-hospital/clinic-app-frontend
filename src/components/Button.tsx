@@ -1,13 +1,14 @@
 import { ButtonProperties } from '../types/ButtonProperties';
 import '../styles/Button.css';
 
-const Button = (properties: ButtonProperties) => {
+const Button = ({ type, onClick, text, css }: ButtonProperties) => {
   return (
     <button
-      className={`btn ${properties.type === 'primary' ? 'btn-primary' : 'btn-secondary'}`}
-      onClick={properties.onClick}
+      className={`btn ${type === 'primary' ? 'btn-primary' : 'btn-secondary'}`}
+      onClick={onClick}
+      style={css}
     >
-      {properties.text}
+      {text}
     </button>
   );
 };

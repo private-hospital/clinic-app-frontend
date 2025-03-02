@@ -4,7 +4,8 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    font-weight: 400;
 }
 
 .btn:active {
