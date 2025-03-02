@@ -9,11 +9,14 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "composite": true,
 
     /* Linting */
     "strict": true,
