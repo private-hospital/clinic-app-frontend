@@ -7,11 +7,11 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "types": ["unplugin-fonts/client"],
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ES2020",
     "target": "ESNext",
     "moduleResolution": "bundler"
   },
   "include": ["src"],
-  "exclude": ["dist", "test", "**/*.d.ts"]
+  "exclude": ["node_modules", "dist", "dist-node"]
 }

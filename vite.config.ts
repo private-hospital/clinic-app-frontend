@@ -6,6 +6,10 @@ export default defineConfig({
   define: {
     'process.env': process.env,
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
   plugins: [
     react(),
     Unfonts({

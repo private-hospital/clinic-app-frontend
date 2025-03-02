@@ -4,8 +4,8 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
+    "lib": ["ES2020","DOM", "DOM.Iterable"],
+    "module": "ES2020",
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -17,6 +17,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "composite": true,
 
     /* Linting */
@@ -24,7 +25,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "dist-node"],
+
 }

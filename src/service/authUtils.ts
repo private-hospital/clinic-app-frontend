@@ -5,12 +5,12 @@ import { UserRoles } from '../types/users';
 export const getTokenPayload: () => JwtPayload | null = () => {
   try {
     const token: string | null = localStorage.getItem(
-      import.meta.env.VITE_CDN_BASE_URL,
+      import.meta.env.VITE_CDN_BASE_URL!,
     );
     return jwtDecode<DecodedJwt>(token!).sub;
   } catch (e) {
     console.log(e);
-    localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME);
+    localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!);
   }
   return null;
 };

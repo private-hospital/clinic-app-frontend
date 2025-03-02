@@ -2,5 +2,7 @@
   "compilerOptions": {
     "types": ["jest", "@testing-library/jest-dom", "unplugin-fonts/client"],
     "jsx": "react-jsx",
-  }
+  },
+  "include": ["test"],
+  "exclude": ["node_modules", "dist", "dist-node"]
 }
