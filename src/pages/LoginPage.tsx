@@ -18,18 +18,22 @@ const LoginPage = () => {
   );
 
   const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = () => {
+    let success: boolean = true;
     setEmailError(undefined);
     setPasswordError(undefined);
     if (!email) {
       setEmailError('Введіть email');
+      success = false;
     } else if (!validator.isEmail(email)) {
       setEmailError('Невірний формат');
+      success = false;
     }
     if (!password) {
       setPasswordError('Введіть пароль');
+      success = false;
     }
 
-    if (emailError || passwordError) {
+    if (!success) {
       toast.error('Не вдалось авторизуватись');
       return;
     }
