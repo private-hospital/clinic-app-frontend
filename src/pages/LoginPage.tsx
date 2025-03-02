@@ -25,7 +25,7 @@ const LoginPage = () => {
       setEmailError('Введіть email');
       success = false;
     } else if (!validator.isEmail(email)) {
-      setEmailError('Невірний формат');
+      setEmailError('Неправильний формат');
       success = false;
     }
     if (!password) {
