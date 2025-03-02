@@ -19,7 +19,8 @@
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.2.0"
+    "react-router": "^7.2.0",
+    "unplugin-fonts": "^1.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -42,7 +43,6 @@
     "ts-jest": "^29.2.6",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "unplugin-fonts": "^1.3.1",
     "vite": "^6.2.0"
   }
 }
