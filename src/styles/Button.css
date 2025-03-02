@@ -1,0 +1,22 @@
+.btn {
+    height: 4rem;
+    width: 30rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: #4699e6;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #ededed;
+    color: #5a5a5a;
+}

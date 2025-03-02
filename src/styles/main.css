@@ -1,0 +1,15 @@
+h1, h2, h3, h4, h5, h6 {
+    font-family: "MazzardH", sans-serif;
+}
+
+p {
+    font-family: Roboto, sans-serif;
+}
+
+button {
+    font-family: Roboto, sans-serif;
+}
+
+html {
+    font-size: 16px;
+}

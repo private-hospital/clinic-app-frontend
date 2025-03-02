@@ -6,6 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "jsx": "react-jsx",
+    "types": ["unplugin-fonts/client"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

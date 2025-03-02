@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-dom"],
-    "jsx": "react-jsx"
+    "types": ["jest", "@testing-library/jest-dom", "unplugin-fonts/client"],
+    "jsx": "react-jsx",
   }
 }
