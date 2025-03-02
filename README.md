@@ -9,3 +9,7 @@ npm i
 ```shell
 npm run dev
 ```
+3. Run lint fix
+```shell
+npm run valid
+```
