@@ -1,6 +1,0 @@
-{
-  "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-dom"],
-    "jsx": "react-jsx"
-  }
-}

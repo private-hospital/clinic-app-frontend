@@ -1,0 +1,34 @@
+.full-page-box {
+    height: 95vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.centered-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+p {
+    text-align: center;
+    font-size: 1.4rem;
+    padding: 0;
+    margin: 0 0 2rem;
+    color: #5a5a5a;
+    font-weight: 300;
+}
+
+button {
+    font-weight: 400;
+}
+
+h5 {
+    text-align: center;
+    font-weight: 500;
+    font-size: 3rem;
+    margin: 3rem 0 0;
+    padding: 0;
+}

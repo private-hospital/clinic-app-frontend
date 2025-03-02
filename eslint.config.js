@@ -29,6 +29,7 @@ export default tseslint
         semi: ['error', 'always'],
         quotes: ['error', 'single', { avoidEscape: true }],
         'react/prop-types': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
       },
     },
   )

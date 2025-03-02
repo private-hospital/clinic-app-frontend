@@ -1,0 +1,54 @@
+div {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+input {
+    height: 3.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #ededed;
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.input-error {
+    background-color: #ffe5e5;
+    border: 1px #c70000 solid;
+}
+
+.error-message {
+    color: #c70000;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.input-error::placeholder {
+   color: #ffb7b7;
+}
+
+input::placeholder {
+    font-weight: 400;
+    color: #cccccc;
+    opacity: 1;
+}
+
+label {
+    font-weight: 300;
+    font-size: 1.4rem;
+    color: #5a5a5a;
+}
+
+.labels-holder {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 0 0.5rem;
+}
