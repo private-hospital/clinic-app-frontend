@@ -21,7 +21,7 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitted },
+    formState: { errors },
   } = useForm<LoginFormDto>({
     resolver: zodResolver(loginSchema),
     reValidateMode: 'onSubmit',
@@ -92,6 +92,7 @@ const LoginPage = () => {
           </p>
         </div>
         <form
+          noValidate
           className="centered-flex-box"
           style={{ marginTop: '2rem' }}
           onSubmit={handleSubmit(onSubmit)}
@@ -101,7 +102,7 @@ const LoginPage = () => {
             placeholder="example@vitalineph.com"
             label="Email"
             inputId="email"
-            error={isSubmitted ? errors.email?.message : undefined}
+            error={errors.email?.message}
             register={register('email')}
           />
           <Input
@@ -109,7 +110,7 @@ const LoginPage = () => {
             placeholder="••••••••"
             label="Пароль"
             inputId="password"
-            error={isSubmitted ? errors.password?.message : undefined}
+            error={errors.password?.message}
             register={register('password')}
           />
           <Button
