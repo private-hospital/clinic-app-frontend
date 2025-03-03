@@ -2,17 +2,13 @@ import '../styles/NotFound.css';
 import Button from '../components/Button';
 import 'unfonts.css';
 import { useNavigate } from 'react-router';
-import { isClinicHead, isDoctor, isRegistrar } from '../service/authUtils';
+import { goToMainPage } from '../service/navigationUtils';
+import { useContext } from 'react';
+import { AuthContext } from '../components/AuthContext';
 
 const NotFound = () => {
   const navigate = useNavigate();
-
-  const goToMainPageHandler: () => void = () => {
-    if (isDoctor()) navigate('/appointments');
-    else if (isRegistrar()) navigate('/registry');
-    else if (isClinicHead()) navigate('/statistics');
-    else navigate('/login');
-  };
+  const authCtx = useContext(AuthContext)!;
 
   return (
     <div className="full-page-box">
@@ -26,7 +22,7 @@ const NotFound = () => {
         <Button
           type="primary"
           text="Повернутися на головну сторінку"
-          onClick={goToMainPageHandler}
+          onClick={() => goToMainPage(navigate, authCtx.tokenPayload?.role)}
           isSubmit={false}
         />
       </div>
