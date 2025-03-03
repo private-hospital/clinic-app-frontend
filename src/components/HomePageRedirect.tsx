@@ -1,10 +1,18 @@
 import { Navigate } from 'react-router';
-import { isClinicHead, isDoctor, isRegistrar } from '../service/authUtils';
+import { useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
 const HomePageRedirect = () => {
-  if (isDoctor()) return <Navigate to="/appointments" />;
-  else if (isRegistrar()) return <Navigate to="/registry" />;
-  else if (isClinicHead()) return <Navigate to="/statistics" />;
+  const authCtx = useContext(AuthContext);
+  if (!authCtx || !authCtx.tokenPayload) {
+    return <Navigate to="/login" />;
+  } else if (authCtx.tokenPayload.role === 'DOCTOR') {
+    return <Navigate to="/appointments" />;
+  } else if (authCtx.tokenPayload.role === 'REGISTRAR') {
+    return <Navigate to="/registry" />;
+  } else if (authCtx.tokenPayload.role === 'CLINIC_HEAD') {
+    return <Navigate to="/statistics" />;
+  }
   return <Navigate to="/login" />;
 };
 

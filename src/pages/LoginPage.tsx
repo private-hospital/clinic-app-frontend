@@ -2,32 +2,65 @@ import '../styles/LoginPage.css';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-
-const loginSchema = z.object({
-  email: z.string().nonempty('Введіть email').email('Неправильний формат'),
-  password: z.string().nonempty('Введіть пароль'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { LoginFormDto, loginSchema } from '../types/auth';
+import { goToMainPage } from '../service/navigationUtils';
+import { useNavigate } from 'react-router';
+import { useContext } from 'react';
+import { AuthContext } from '../components/AuthContext';
+import { getTokenPayload } from '../service/authUtils';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const authCtx = useContext(AuthContext)!;
+  if (authCtx.tokenPayload) {
+    goToMainPage(navigate, authCtx.tokenPayload.role);
+  }
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitted },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginFormDto>({
     resolver: zodResolver(loginSchema),
     reValidateMode: 'onSubmit',
     mode: 'onSubmit',
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormDto) => {
     try {
-      toast.success('Успішна авторизація');
       console.log(data);
+
+      if (data.email.toLowerCase() === 'doctor@gmail.com') {
+        localStorage.setItem(
+          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJET0NUT1IifSwiaWF0IjoxNzQwOTI1ODk5LCJleHAiOjE3NDE3ODk4OTl9.zJ8-cKpdrk_9ra_8kmHlhGzegTE-teWEy3xUPETeaRk',
+        );
+      }
+      if (data.email.toLowerCase() === 'head@gmail.com') {
+        localStorage.setItem(
+          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJDTElOSUNfSEVBRCJ9LCJpYXQiOjE3NDA5MjY0NDksImV4cCI6MTc0MTc5MDQ0OX0.5VIVeWkHLXrF9kHaXBGBkm4Y1GwNJO2nq8MhH9ZUmu8',
+        );
+      }
+      if (data.email.toLowerCase() === 'registrar@gmail.com') {
+        localStorage.setItem(
+          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJSRUdJU1RSQVIifSwiaWF0IjoxNzQwOTI2NDE0LCJleHAiOjE3NDE3OTA0MTR9.LVwt0rOmF_y__Wcs1oU5pm4atJoUReRqDcNYbrrrQSs',
+        );
+      }
+
+      const token: string = localStorage.getItem(
+        import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
+      )!;
+      authCtx?.setTokenPayload(getTokenPayload(token));
+
+      toast.success('Успішна авторизація');
+
+      console.log(authCtx);
+      goToMainPage(navigate, authCtx.tokenPayload?.role);
+
       // Example API call (uncomment if needed)
       // const response = await api.post<LoginResponseDto, LoginRequestDto>(
       //   '/public/login',
