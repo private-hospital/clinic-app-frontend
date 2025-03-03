@@ -1,0 +1,35 @@
+.link-holder {
+    display: flex;
+    width: fit-content;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0 2rem;
+    height: 2rem;
+}
+
+.link-holder:hover {
+    cursor: pointer;
+}
+
+.link-holder:active {
+    transform: scale(0.98);
+}
+
+.icon-style {
+    padding: 0;
+    margin: 0 1rem 0 0;
+}
+
+.selected {
+    background-color: #4699e6;
+    color: white;
+    border-radius: 3px;
+}
+
+.text-style {
+    margin: 0;
+    padding: 0;
+    font-size: 1.1rem;
+}
