@@ -27,6 +27,7 @@ const NotFound = () => {
           type="primary"
           text="Повернутися на головну сторінку"
           onClick={goToMainPageHandler}
+          isSubmit={false}
         />
       </div>
     </div>
