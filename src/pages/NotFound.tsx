@@ -18,7 +18,7 @@ const NotFound = () => {
     <div className="full-page-box">
       <div className="centered-box">
         <img
-          src="https://cdn.vitalineph.com/jpg/Vector.jpg"
+          src={`${import.meta.env.VITE_CDN_BASE_URL}/jpg/Vector.jpg`}
           alt="Error 404 image"
         />
         <h5>Упс! Щось сталося!</h5>

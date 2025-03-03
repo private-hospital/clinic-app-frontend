@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import * as React from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 
 export interface InputProperties {
   type: 'text' | 'number' | 'email' | 'password';
@@ -7,6 +7,8 @@ export interface InputProperties {
   label: string;
   inputId: string;
   css?: CSSProperties;
-  setValue: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  // setValue?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  // value: string;
+  register?: UseFormRegisterReturn;
   error?: string;
 }
