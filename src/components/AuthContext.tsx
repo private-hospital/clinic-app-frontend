@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { JwtPayload } from '../types/jwt';
 import { getTokenPayload } from '../service/authUtils';
 
-interface AuthContextType {
+export interface AuthContextType {
   tokenPayload: JwtPayload | null;
   setTokenPayload: React.Dispatch<React.SetStateAction<JwtPayload | null>>;
 }

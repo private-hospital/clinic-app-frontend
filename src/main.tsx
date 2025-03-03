@@ -8,6 +8,12 @@ import LoginPage from './pages/LoginPage';
 import './styles/main.css';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './components/AuthContext';
+import RegistryPage from './pages/RegistryPage';
+import PatientPage from './pages/PatientPage';
+import Appointments from './pages/Appointments';
+import Statistics from './pages/Statistics';
+import PriceLists from './pages/PriceLists';
+import Statements from './pages/Statements';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -20,16 +26,16 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/login" element={<LoginPage />} />
 
           {/*  Doctor | Registrar */}
-          <Route path="/registry" element={<>Registry</>} />
-          <Route path="/patient/:id" element={<>Patient</>} />
+          <Route path="/registry" element={<RegistryPage />} />
+          <Route path="/patient/:id" element={<PatientPage />} />
 
           {/*  Doctor */}
-          <Route path="/appointments" element={<>Appointments</>} />
+          <Route path="/appointments" element={<Appointments />} />
 
           {/*  Clinic Head*/}
-          <Route path="/statistics" element={<>Statistics</>} />
-          <Route path="/price-lists" element={<>Price lists</>} />
-          <Route path="/statements" element={<>Statements</>} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/price-lists" element={<PriceLists />} />
+          <Route path="/statements" element={<Statements />} />
 
           {/*  Errors */}
           <Route path="/*" element={<NotFound />} />
