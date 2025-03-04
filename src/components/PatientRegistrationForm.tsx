@@ -195,6 +195,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
                 paddingLeft: '2rem',
                 paddingRight: '2rem',
                 height: '3.5rem',
+                marginTop: '2rem',
               }}
             />
           </form>
