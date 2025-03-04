@@ -24,8 +24,10 @@ import {
   MedicalCardRecordDto,
   medicalCardRecordsTestData,
 } from '../types/cardRecords';
+import NewAppointmentForm from '../components/NewAppointmentForm';
 
 const PatientPage = () => {
+  const [isAppointmentFormOpened, setIsAppointmentFormOpened] = useState(false);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
   const { id: ids } = useParams<RouteParams>();
@@ -109,6 +111,10 @@ const PatientPage = () => {
   return (
     <div className="auth-body">
       <Header />
+      <NewAppointmentForm
+        isOpen={isAppointmentFormOpened}
+        onClose={() => setIsAppointmentFormOpened(false)}
+      />
       <div className="data-holder">
         <h1 className="page-title">Медична картка пацієнта</h1>
         <div className="pat-info-block">
@@ -225,6 +231,7 @@ const PatientPage = () => {
                       paddingLeft: '3rem',
                       paddingRight: '3rem',
                       height: '3.2rem',
+                      marginTop: '2rem',
                     }}
                   />
                 )}
@@ -334,6 +341,7 @@ const PatientPage = () => {
                     paddingRight: '3rem',
                     height: '3.2rem',
                   }}
+                  onClick={() => setIsAppointmentFormOpened(true)}
                 />
               )}
             </div>

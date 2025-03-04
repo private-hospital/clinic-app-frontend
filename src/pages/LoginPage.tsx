@@ -116,7 +116,7 @@ const LoginPage = () => {
           <Button
             type="primary"
             text="Вхід"
-            css={{ width: '100%' }}
+            css={{ width: '100%', marginTop: '2rem' }}
             isSubmit={true}
           />
         </form>

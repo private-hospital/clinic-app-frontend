@@ -14,6 +14,24 @@ export interface AppointmentsRegistryDto {
   totalPages: number;
 }
 
+import { z } from 'zod';
+
+export const appointmentRowSchema = z.object({
+  service: z.string().nonempty('Оберіть послугу'),
+  doctorName: z.string().nonempty('Оберіть лікаря'),
+  date: z.string().nonempty('Оберіть дату прийому'),
+  time: z.string().nonempty('Оберіть час'),
+});
+
+export type AppointmentRow = z.infer<typeof appointmentRowSchema>;
+
+export const stepOneSchema = z.object({
+  appointments: z
+    .array(appointmentRowSchema)
+    .min(1, 'Додайте хоча б один запис'),
+});
+export type StepOneForm = z.infer<typeof stepOneSchema>;
+
 export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
   {
     id: 1,

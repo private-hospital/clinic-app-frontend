@@ -18,16 +18,12 @@ const Input = (p: InputProperties) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      console.log(event.target);
-      console.log(dropdownRef.current);
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setShowDropdown(false);
-        console.log('hello');
       }
-      console.log('hiiii');
     };
 
     if (showDropdown) {
@@ -46,7 +42,9 @@ const Input = (p: InputProperties) => {
           <label htmlFor={p.inputId} className="label-text">
             {p.label}
           </label>
-          {p.error && <p className="label-text error-message">{p.error}</p>}
+          {!p.disableErr && p.error && (
+            <p className="label-text error-message">{p.error}</p>
+          )}
         </div>
         <input
           id={p.inputId}
@@ -57,6 +55,7 @@ const Input = (p: InputProperties) => {
           className={p.error ? 'input-error' : ''}
           {...p.register}
           disabled={!!p.disabled}
+          onChange={p.onChange}
         />
       </div>
     );
@@ -67,7 +66,9 @@ const Input = (p: InputProperties) => {
         <label htmlFor={p.inputId} className="label-text">
           {p.label}
         </label>
-        {p.error && <p className="label-text error-message">{p.error}</p>}
+        {!p.disableErr && p.error && (
+          <p className="label-text error-message">{p.error}</p>
+        )}
       </div>
       <div className="input-wrapper" ref={dropdownRef}>
         {showDropdown && (
@@ -86,6 +87,7 @@ const Input = (p: InputProperties) => {
           className={p.error ? 'input-error' : ''}
           {...p.register}
           disabled={!!p.disabled}
+          onChange={p.onChange}
         />
         <img
           src={`${import.meta.env.VITE_CDN_BASE_URL}/svg/dots.svg`}
