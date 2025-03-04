@@ -1,0 +1,124 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    position: relative;
+    background: #fff;
+    width: fit-content;
+    max-width: 90%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+    margin-top: 5vh;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 4rem;
+    font-weight: 100;
+    color: #595959;
+}
+
+.step-indicator {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.step1-form {
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.custom-table {
+    margin-bottom: 1rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.custom-table thead tr {
+    background-color: #cce7ff;
+    height: 3rem;
+    text-align: left;
+    font-size: 1.1rem;
+}
+
+.custom-table th {
+    padding: 1rem;
+    font-weight: 500;
+    font-size: 1.3rem;
+}
+
+.custom-table th:first-child {
+    border-bottom-left-radius: 6px;
+}
+
+.custom-table th:last-child {
+    border-bottom-right-radius: 6px;
+}
+
+.custom-table tbody tr {
+    height: 3rem;
+}
+
+.custom-table td {
+    padding: 0.5rem;
+    min-width: 8rem;
+}
+
+.add-row-button {
+    width: 100%;
+    height: 3rem;
+    font-size: 1.5rem;
+    border-radius: 6px;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.submit-row {
+    width: fit-content;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.step2-container {
+    width: 70vw;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.step2-container td {
+    font-weight: 300;
+    font-size: 1.2rem;
+}
+
+.custom-table tr.sum-row td {
+    border-top: 1px solid #4B9CE6;
+}

@@ -9,7 +9,11 @@ export interface SelectProperties {
   label: string;
   selectId: string;
   error?: string;
+  disableErr?: boolean;
   css?: React.CSSProperties;
   register?: any;
   options: SelectOption[];
+  disabled?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value?: string;
 }

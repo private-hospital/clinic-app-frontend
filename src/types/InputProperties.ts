@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
 export interface InputProperties {
@@ -7,9 +7,11 @@ export interface InputProperties {
   label: string;
   inputId: string;
   css?: CSSProperties;
-  // setValue?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  // value: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
   register?: UseFormRegisterReturn;
   error?: string;
+  disableErr?: boolean;
   disabled?: boolean;
+  cancelId?: number;
 }

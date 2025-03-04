@@ -15,6 +15,7 @@ const Header = () => {
 
   const handleLogout: () => void = () => {
     localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!);
+    authCtx.setTokenPayload(null);
     goToMainPage(navigate);
   };
 
