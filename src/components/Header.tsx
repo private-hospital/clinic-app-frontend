@@ -47,6 +47,9 @@ const Header = () => {
           className="logout"
           src={import.meta.env.VITE_CDN_BASE_URL + '/svg/logout.svg'}
           onClick={handleLogout}
+          onMouseOver={() => {}}
+          onFocus={() => {}}
+          onKeyDown={() => {}}
         />
       </div>
     </header>

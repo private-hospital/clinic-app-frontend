@@ -10,6 +10,9 @@ const NavigationButton = (p: NavigationButtonProps) => {
   return (
     <div
       onClick={() => navigate(p.path)}
+      onMouseOver={() => {}}
+      onFocus={() => {}}
+      onKeyDown={() => {}}
       className={'link-holder' + (isActive ? ' selected' : '')}
     >
       <img
