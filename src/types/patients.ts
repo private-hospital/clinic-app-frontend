@@ -37,7 +37,7 @@ export const stepTwoSchema = z.object({
 });
 
 export const stepThreeSchema = z.object({
-  discountGroup: z.string().optional(),
+  benefit: z.string().optional(),
 });
 
 export const patientsTestData: PatientsRegistryEntryDto[] = [

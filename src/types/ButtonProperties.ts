@@ -7,4 +7,5 @@ export interface ButtonProperties {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   css?: CSSProperties;
   isSubmit: boolean;
+  disabled?: boolean;
 }

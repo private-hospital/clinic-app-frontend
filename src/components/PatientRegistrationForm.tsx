@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -31,16 +31,18 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
 }) => {
   const [step, setStep] = useState(1);
 
+  const [count, setCount] = useState<number>(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [isCodeBlocked, setIsCodeBlocked] = useState(false);
+
   const [patientData, setPatientData] = useState<Partial<PatientData>>({});
-  const decOnClose = () => {
-    setPatientData({});
-    onClose();
-  };
 
   const {
     register: registerStep1,
     handleSubmit: handleSubmitStep1,
     formState: { errors: errorsStep1 },
+    reset: resetStep1,
   } = useForm<StepOneData>({
     resolver: zodResolver(stepOneSchema),
     reValidateMode: 'onSubmit',
@@ -51,6 +53,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
     register: registerStep2,
     handleSubmit: handleSubmitStep2,
     formState: { errors: errorsStep2 },
+    reset: resetStep2,
   } = useForm<StepTwoData>({
     resolver: zodResolver(stepTwoSchema),
     reValidateMode: 'onSubmit',
@@ -61,11 +64,21 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
     register: registerStep3,
     handleSubmit: handleSubmitStep3,
     formState: { errors: errorsStep3 },
+    reset: resetStep3,
   } = useForm<StepThreeData>({
     resolver: zodResolver(stepThreeSchema),
     reValidateMode: 'onSubmit',
     mode: 'onSubmit',
   });
+
+  const decOnClose = () => {
+    setIsCodeBlocked(false);
+    setStep(1);
+    resetStep1();
+    resetStep2();
+    resetStep3();
+    onClose();
+  };
 
   const onSubmitStep1 = (data: StepOneData) => {
     setPatientData((prev) => ({ ...prev, ...data }));
@@ -74,13 +87,14 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
 
   const onSubmitStep2 = (data: StepTwoData) => {
     setPatientData((prev) => ({ ...prev, ...data }));
+    setIsCodeBlocked(true);
     setStep(3);
   };
 
   const onSubmitStep3 = (data: StepThreeData) => {
-    const finalData = { ...patientData, ...data } as PatientData;
-    console.log('Submitting patient data:', finalData);
-
+    const d = { ...patientData, ...data } as PatientData;
+    console.log(d);
+    toast.success('Пацієнт був успішно доданий');
     decOnClose();
   };
 
@@ -208,28 +222,50 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               placeholder="234554"
               error={errorsStep2.verificationCode?.message}
               register={registerStep2('verificationCode')}
+              disabled={isCodeBlocked}
             />
 
             <div
               className="button-row"
               style={{ width: '100%', alignItems: 'center' }}
             >
-              <Button
-                type="primary"
-                text="Відправити код"
-                isSubmit={false}
-                css={{
-                  width: 'fit-content',
-                  fontSize: '1rem',
-                  fontWeight: 400,
-                  paddingLeft: '2rem',
-                  paddingRight: '2rem',
-                  height: '3.5rem',
-                }}
-                onClick={() => {
-                  toast.success('Код успішно відправлено!');
-                }}
-              />
+              {!isCodeBlocked && (
+                <Button
+                  type={count > 0 ? 'secondary' : 'primary'}
+                  text="Відправити код"
+                  isSubmit={false}
+                  css={{
+                    width: 'fit-content',
+                    fontSize: '1rem',
+                    fontWeight: 400,
+                    paddingLeft: '2rem',
+                    paddingRight: '2rem',
+                    height: '3.5rem',
+                  }}
+                  disabled={count > 0}
+                  onClick={() => {
+                    setCount(30);
+                    intervalRef.current = setInterval(() => {
+                      setCount((prevCount) => {
+                        if (prevCount <= 1) {
+                          if (intervalRef.current) {
+                            clearInterval(intervalRef.current);
+                          }
+                          return 0;
+                        }
+                        return prevCount - 1;
+                      });
+                    }, 1000);
+                    toast.success('Код успішно відправлено!');
+                  }}
+                />
+              )}
+              {count !== 0 && (
+                <p style={{ margin: 0 }}>
+                  Повторно відправити код можна через{' '}
+                  <b style={{ fontWeight: 500 }}>{count} секунд</b>
+                </p>
+              )}
             </div>
             <div
               className="button-row"
@@ -248,8 +284,9 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
                   width: 'fit-content',
                   fontSize: '1rem',
                   fontWeight: 400,
-                  paddingLeft: '2rem',
-                  paddingRight: '2rem',
+                  paddingLeft: '4rem',
+                  paddingRight: '4rem',
+                  marginRight: '1rem',
                   height: '3.5rem',
                 }}
                 onClick={() => setStep(1)}
@@ -275,10 +312,8 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
           <form onSubmit={handleSubmitStep3(onSubmitStep3)} noValidate>
             <h2>Вибір пільгової групи</h2>
             <div style={{ marginBottom: '1rem' }}>
-              <label htmlFor="discountGroup">
-                Пільгова група (необов’язково)
-              </label>
-              <select id="discountGroup" {...registerStep3('discountGroup')}>
+              <label htmlFor="benefit">Пільгова група (необов’язково)</label>
+              <select id="benefit" {...registerStep3('benefit')}>
                 <option value="">Без пільг</option>
                 <option value="family">
                   Члени родин працівників (знижка 40%)
@@ -286,21 +321,45 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
                 <option value="students">Студенти (знижка 20%)</option>
                 <option value="pensioners">Пенсіонери (знижка 30%)</option>
               </select>
-              {errorsStep3.discountGroup && (
+              {errorsStep3.benefit && (
                 <span style={{ color: 'red' }}>
-                  {errorsStep3.discountGroup.message}
+                  {errorsStep3.benefit.message}
                 </span>
               )}
             </div>
 
-            <div className="button-row">
+            <div
+              className="button-row"
+              style={{ flexDirection: 'row', justifyContent: 'center' }}
+            >
+              <Button
+                type="secondary"
+                text="Назад"
+                isSubmit={false}
+                css={{
+                  width: 'fit-content',
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  paddingLeft: '2rem',
+                  paddingRight: '2rem',
+                  marginRight: '1rem',
+                  height: '3.5rem',
+                }}
+                onClick={() => setStep(2)}
+              />
               <Button
                 type="primary"
                 text="Зберегти пацієнта"
-                isSubmit={false}
-                onClick={() => setStep(2)}
+                isSubmit={true}
+                css={{
+                  width: 'fit-content',
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  paddingLeft: '2rem',
+                  paddingRight: '2rem',
+                  height: '3.5rem',
+                }}
               />
-              <Button type="primary" text="Зберегти пацієнта" isSubmit={true} />
             </div>
           </form>
         )}

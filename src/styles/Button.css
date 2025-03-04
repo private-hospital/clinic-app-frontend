@@ -21,3 +21,11 @@
     background-color: #ededed;
     color: #5a5a5a;
 }
+
+.btn:disabled:active {
+    transform: none;
+}
+
+.btn:disabled:hover {
+    cursor: auto;
+}

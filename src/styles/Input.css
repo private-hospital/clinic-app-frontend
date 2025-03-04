@@ -30,6 +30,14 @@ input, select {
     font-size: 1.2rem;
 }
 
+input:disabled {
+    color: #cccccc;
+}
+
+input:disabled:hover {
+    cursor: not-allowed;
+}
+
 .input-error::placeholder {
    color: #ffb7b7;
 }
