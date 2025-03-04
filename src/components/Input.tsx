@@ -15,8 +15,6 @@ const Input = (p: InputProperties) => {
         type={p.type}
         placeholder={p.placeholder}
         style={p.css}
-        // onChange={p.setValue}
-        // value={p.value}
         className={p.error ? 'input-error' : ''}
         {...p.register}
       />
