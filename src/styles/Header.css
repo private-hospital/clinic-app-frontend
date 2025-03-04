@@ -24,7 +24,6 @@ header {
 }
 
 .info-block {
-    flex-basis: 25%;
     margin: 0;
     padding: 0;
     display: flex;
@@ -71,6 +70,30 @@ header {
 
 body {
     background-color: #c2dafc;
+}
+
+@media (max-width: 3000px) {
+    .info-block {
+        flex-basis: 12%;
+    }
+}
+
+@media (max-width: 2500px) {
+    .info-block {
+        flex-basis: 15%;
+    }
+}
+
+@media (max-width: 2000px) {
+    .info-block {
+        flex-basis: 20%;
+    }
+}
+
+@media (max-width: 1600px) {
+    .info-block {
+        flex-basis: 25%;
+    }
 }
 
 @media (max-width: 1370px) {
