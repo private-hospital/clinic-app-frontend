@@ -23,6 +23,7 @@ import { appointmentsTestData } from '../types/appointments';
 import {
   MedicalCardRecordDto,
   medicalCardRecordsTestData,
+  MedicalCardRecordTypes,
 } from '../types/cardRecords';
 import NewAppointmentForm from '../components/NewAppointmentForm';
 import MedicalRecordForm from '../components/MedicalRecordForm';
@@ -99,11 +100,11 @@ const PatientPage = () => {
 
   const getTypeLabel = (type: MedicalCardRecordDto['type']) => {
     switch (type) {
-      case 'DIAGNOSIS':
+      case MedicalCardRecordTypes.DIAGNOSIS:
         return 'Діагноз';
-      case 'ANALYSIS_RESULTS':
+      case MedicalCardRecordTypes.ANALYSIS_RESULTS:
         return 'Результати аналізів';
-      case 'NECESSARY_EXAMINATIONS':
+      case MedicalCardRecordTypes.NECESSARY_EXAMINATIONS:
         return 'Направлення на обстеження';
       default:
         return '';
@@ -298,7 +299,10 @@ const PatientPage = () => {
                           fontSize: '1.2rem',
                         }}
                         cancelId={
-                          a.status === 'Запланований' ? a.id : undefined
+                          authCtx.tokenPayload?.role === 'REGISTRAR' &&
+                          a.status === 'Запланований'
+                            ? a.id
+                            : undefined
                         }
                       />
                       <Input

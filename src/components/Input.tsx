@@ -51,7 +51,7 @@ const Input = (p: InputProperties) => {
           type={p.type}
           placeholder={p.placeholder}
           style={p.css}
-          value={p.value && p.value}
+          value={p.value}
           className={p.error ? 'input-error' : ''}
           {...p.register}
           disabled={!!p.disabled}
@@ -94,6 +94,9 @@ const Input = (p: InputProperties) => {
           alt="dots icon"
           className="dots-icon"
           onClick={toggleDropdown}
+          onFocus={() => {}}
+          onKeyDown={() => {}}
+          onMouseOver={() => {}}
         />
       </div>
     </div>

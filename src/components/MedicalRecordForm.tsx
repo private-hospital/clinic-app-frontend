@@ -140,6 +140,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
             )}
           />
 
+          <div style={{ marginTop: '1rem' }}></div>
           {selectedType === MedicalCardRecordTypes.DIAGNOSIS && (
             <Input
               type="text"
