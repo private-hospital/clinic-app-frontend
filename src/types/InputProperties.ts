@@ -2,7 +2,7 @@ import { CSSProperties } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
 export interface InputProperties {
-  type: 'text' | 'number' | 'email' | 'password';
+  type: 'text' | 'number' | 'email' | 'password' | 'date' | 'phone';
   placeholder: string;
   label: string;
   inputId: string;
@@ -11,4 +11,5 @@ export interface InputProperties {
   // value: string;
   register?: UseFormRegisterReturn;
   error?: string;
+  disabled?: boolean;
 }

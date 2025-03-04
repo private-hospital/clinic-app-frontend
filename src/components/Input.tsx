@@ -17,6 +17,7 @@ const Input = (p: InputProperties) => {
         style={p.css}
         className={p.error ? 'input-error' : ''}
         {...p.register}
+        disabled={!!p.disabled}
       />
     </div>
   );

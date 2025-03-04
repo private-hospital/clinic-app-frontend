@@ -1,0 +1,117 @@
+/* PatientRegistrationForm.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* dim the background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* on top of everything */
+}
+
+.modal-content {
+    position: relative;
+    background: #fff;
+    width: 30vw;
+    max-width: 90%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 600;
+    color: black;
+    font-family: MazzardH, sans-serif;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 4rem;
+    font-weight: 100;
+    color: #595959;
+}
+
+.step-indicator {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.primary-btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+.secondary-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.button-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.top-buttons-block {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 1700px) {
+    .modal-content {
+        width: 30vw;
+    }
+}
+
+@media (min-width: 2200px) {
+    .modal-content {
+        width: 25vw;
+    }
+}
+
+@media (max-width: 1480px) {
+    .modal-content {
+        width: 50vw;
+    }
+}
+
+@media (max-width: 1000px) {
+    .modal-content {
+        width: 75vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%;
+    }
+}
