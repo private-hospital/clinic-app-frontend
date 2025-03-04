@@ -6,11 +6,8 @@ import { UserRoles } from '../types/users';
 import Header from '../components/Header';
 import '../styles/authPages.css';
 import '../styles/RegistryPage.css';
-import {
-  PatientsRegistryDto,
-  PatientsRegistryEntryDto,
-  patientsTestData,
-} from '../types/patients';
+import { PatientsRegistryDto, patientsTestData } from '../types/patients';
+import Pagination from '../components/Pagination';
 
 const RegistryPage = () => {
   const navigate = useNavigate();
@@ -26,29 +23,45 @@ const RegistryPage = () => {
   };
 
   const [page, setPage] = useState(1);
-  const [data, setData] = useState<PatientsRegistryEntryDto[]>([]);
+  const [data, setData] = useState<PatientsRegistryDto | null>(null);
   const fetchData = (): PatientsRegistryDto => {
     if (page === 1) {
       return {
-        entries: patientsTestData.slice(0, 3),
+        entries: patientsTestData.slice(0, 10),
         page: 1,
-        perPage: 9,
-        totalPages: 3,
+        perPage: 10,
+        totalPages: 4,
       };
     }
     if (page === 2) {
       return {
-        entries: patientsTestData.slice(3, 6),
-        page: 1,
-        perPage: 3,
-        totalPages: 3,
+        entries: patientsTestData.slice(10, 20),
+        page: 2,
+        perPage: 10,
+        totalPages: 4,
+      };
+    }
+    if (page === 3) {
+      return {
+        entries: patientsTestData.slice(20, 30),
+        page: 3,
+        perPage: 10,
+        totalPages: 4,
+      };
+    }
+    if (page === 4) {
+      return {
+        entries: patientsTestData.slice(30, 36),
+        page: 4,
+        perPage: 10,
+        totalPages: 4,
       };
     }
     return {
-      entries: patientsTestData.slice(6, 8),
+      entries: [],
       page: 1,
-      perPage: 3,
-      totalPages: 3,
+      perPage: 0,
+      totalPages: 1,
     };
   };
 
@@ -61,7 +74,7 @@ const RegistryPage = () => {
   };
 
   useEffect(() => {
-    setData(fetchData().entries);
+    setData(fetchData);
   }, [data, setData, page, setPage, fetchData]);
 
   return (
@@ -113,21 +126,27 @@ const RegistryPage = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((p) => {
-              return (
-                <tr>
-                  <td>{p.id}</td>
-                  <td>{p.fullname}</td>
-                  <td>{p.phone}</td>
-                  <td>{p.email}</td>
-                  <td>{formatDate(p.dob)}</td>
-                  <td>{p.sex}</td>
-                  <td>{p.benefit}</td>
-                </tr>
-              );
-            })}
+            {data &&
+              data.entries.map((p) => {
+                return (
+                  <tr>
+                    <td>{p.id}</td>
+                    <td>{p.fullname}</td>
+                    <td>{p.phone}</td>
+                    <td>{p.email}</td>
+                    <td>{formatDate(p.dob)}</td>
+                    <td>{p.sex}</td>
+                    <td>{p.benefit}</td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
+        <Pagination
+          setPage={setPage}
+          page={page}
+          totalPages={data ? data.totalPages : 1}
+        />
       </div>
     </div>
   );
