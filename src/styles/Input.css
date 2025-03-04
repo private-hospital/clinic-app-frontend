@@ -17,6 +17,10 @@ input, select {
     padding-right: 1rem;
 }
 
+select:disabled {
+    color: #cccccc;
+}
+
 .input-error {
     background-color: #ffe5e5;
     border: 1px #c70000 solid;

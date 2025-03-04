@@ -12,4 +12,5 @@ export interface SelectProperties {
   css?: React.CSSProperties;
   register?: any;
   options: SelectOption[];
+  disabled?: boolean;
 }

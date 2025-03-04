@@ -20,6 +20,10 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
 import { appointmentsTestData } from '../types/appointments';
+import {
+  MedicalCardRecordDto,
+  medicalCardRecordsTestData,
+} from '../types/cardRecords';
 
 const PatientPage = () => {
   const navigate = useNavigate();
@@ -86,10 +90,20 @@ const PatientPage = () => {
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
 
-    const hours = String(dateObj.getHours()).padStart(2, '0');
-    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year}`;
+  };
 
-    return `${day}.${month}.${year} ${hours}:${minutes}`;
+  const getTypeLabel = (type: MedicalCardRecordDto['type']) => {
+    switch (type) {
+      case 'DIAGNOSIS':
+        return 'Діагноз';
+      case 'ANALYSIS_RESULTS':
+        return 'Результати аналізів';
+      case 'NECESSARY_EXAMINATIONS':
+        return 'Направлення на обстеження';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -112,6 +126,7 @@ const PatientPage = () => {
                   inputId="lastName"
                   placeholder="Іванов"
                   error={errors.lastName?.message}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   register={register('lastName')}
                   css={
                     errors.lastName?.message ? {} : { backgroundColor: 'white' }
@@ -124,6 +139,7 @@ const PatientPage = () => {
                   inputId="firstName"
                   placeholder="Іван"
                   error={errors.firstName?.message}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   register={register('firstName')}
                   css={
                     errors.firstName?.message
@@ -138,6 +154,7 @@ const PatientPage = () => {
                   inputId="middleName"
                   placeholder="Іванович"
                   error={errors.middleName?.message}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   register={register('middleName')}
                   css={
                     errors.middleName?.message
@@ -165,6 +182,7 @@ const PatientPage = () => {
                   inputId="email"
                   placeholder="example@vitalineph.com"
                   error={errors.email?.message}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   register={register('email')}
                   css={
                     errors.email?.message ? {} : { backgroundColor: 'white' }
@@ -186,6 +204,7 @@ const PatientPage = () => {
                   label="Стать"
                   selectId="sex"
                   error={errors.sex?.message}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   register={register('sex')}
                   options={[
                     { label: 'Чоловік', value: 'MALE' },
@@ -194,19 +213,21 @@ const PatientPage = () => {
                   css={errors.sex?.message ? {} : { backgroundColor: 'white' }}
                 />
 
-                <Button
-                  type="primary"
-                  text="Зберегти"
-                  isSubmit={true}
-                  css={{
-                    width: 'fit-content',
-                    fontSize: '1.3rem',
-                    fontWeight: 300,
-                    paddingLeft: '3rem',
-                    paddingRight: '3rem',
-                    height: '3.2rem',
-                  }}
-                />
+                {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
+                  <Button
+                    type="primary"
+                    text="Зберегти"
+                    isSubmit={true}
+                    css={{
+                      width: 'fit-content',
+                      fontSize: '1.3rem',
+                      fontWeight: 300,
+                      paddingLeft: '3rem',
+                      paddingRight: '3rem',
+                      height: '3.2rem',
+                    }}
+                  />
+                )}
               </form>
             ) : (
               <p>Завантаження даних пацієнта...</p>
@@ -297,29 +318,95 @@ const PatientPage = () => {
                 )}
               </div>
 
-              <Button
-                type="primary"
-                text="Новий запис до лікаря"
-                isSubmit={false}
-                css={{
-                  width: 'fit-content',
-                  fontSize: '1.3rem',
-                  fontWeight: 300,
-                  paddingLeft: '3rem',
-                  paddingRight: '3rem',
-                  height: '3.2rem',
-                }}
-              />
+              {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
+                <Button
+                  type="primary"
+                  text="Новий запис до лікаря"
+                  isSubmit={false}
+                  css={{
+                    width: 'fit-content',
+                    fontSize: '1.3rem',
+                    fontWeight: 300,
+                    paddingLeft: '3rem',
+                    paddingRight: '3rem',
+                    height: '3.2rem',
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
 
-        <h2
-          className="page-title"
-          style={{ marginTop: '2rem', marginBottom: '2rem' }}
-        >
-          Медичні записи пацієнта
-        </h2>
+        <div className="appointments-controls-block">
+          <h2
+            className="page-title"
+            style={{ marginTop: '2rem', marginBottom: '2rem' }}
+          >
+            Медичні записи пацієнта
+          </h2>
+
+          {authCtx.tokenPayload?.role === UserRoles.DOCTOR && (
+            <Button
+              type="primary"
+              text="+&nbsp;&nbsp;&nbsp;&nbsp; Додати запис до картки"
+              isSubmit={false}
+              css={{
+                width: 'fit-content',
+                fontSize: '1rem',
+                fontWeight: 300,
+                paddingLeft: '2rem',
+                paddingRight: '2rem',
+                height: '3.2rem',
+              }}
+            />
+          )}
+        </div>
+        <div className="medical-records-list">
+          {medicalCardRecordsTestData.map((record, idx) => (
+            <div className="medical-record-card" key={idx}>
+              <div className="mr-top-row">
+                <h4 className="mr-title">{record.title}</h4>
+                <span className="mr-type-badge">
+                  {getTypeLabel(record.type)}
+                </span>
+              </div>
+
+              <div className="mr-bottom-row">
+                <ul className="mr-items">
+                  {/* DIAGNOSIS */}
+                  {record.type === 'DIAGNOSIS' && record.diagnosis && (
+                    <li>{record.diagnosis}</li>
+                  )}
+
+                  {/* ANALYSIS_RESULTS */}
+                  {record.type === 'ANALYSIS_RESULTS' &&
+                  record.analysisResults?.length
+                    ? record.analysisResults.map((res, i) => (
+                        <li key={i}>
+                          <a
+                            href={
+                              import.meta.env.VITE_CDN_BASE_URL + '/sample.pdf'
+                            }
+                            style={{ textDecoration: 'underline' }}
+                          >
+                            {res}
+                          </a>
+                        </li>
+                      ))
+                    : null}
+
+                  {/* NECESSARY_EXAMINATIONS */}
+                  {record.type === 'NECESSARY_EXAMINATIONS' &&
+                  record.examinations?.length
+                    ? record.examinations.map((ex, i) => <li key={i}>{ex}</li>)
+                    : null}
+                </ul>
+
+                <div className="mr-date">{formatDate(record.date)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

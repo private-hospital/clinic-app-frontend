@@ -17,6 +17,7 @@ const Select: React.FC<SelectProperties> = (p) => {
         className={p.error ? 'input-error' : ''}
         style={p.css}
         {...(p.register ? p.register : {})}
+        disabled={!!p.disabled}
       >
         {p.options.map((opt) => (
           <option key={opt.value} value={opt.value}>
