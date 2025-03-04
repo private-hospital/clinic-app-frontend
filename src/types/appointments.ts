@@ -1,4 +1,5 @@
 export interface AppointmentsRegistryEntryDto {
+  id: number;
   service: string;
   appointmentDate: number;
   status: 'Завершений' | 'Скасований' | 'Запланований';
@@ -15,6 +16,7 @@ export interface AppointmentsRegistryDto {
 
 export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
   {
+    id: 1,
     service: 'УЗД судин шиї та голови',
     appointmentDate: new Date(2020, 0, 1, 14, 30).getTime(),
     status: 'Завершений',
@@ -22,6 +24,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Панов Максим Ігорович',
   },
   {
+    id: 2,
     service: 'Консультація невролога',
     appointmentDate: new Date(2021, 2, 15, 10, 0).getTime(),
     status: 'Запланований',
@@ -29,6 +32,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Сидоренко Марія Василівна',
   },
   {
+    id: 3,
     service: 'МРТ головного мозку',
     appointmentDate: new Date(2021, 5, 5, 9, 15).getTime(),
     status: 'Завершений',
@@ -36,6 +40,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Іваненко Олег Петрович',
   },
   {
+    id: 4,
     service: 'УЗД органів черевної порожнини',
     appointmentDate: new Date(2022, 3, 12, 13, 45).getTime(),
     status: 'Скасований',
@@ -43,6 +48,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Коваленко Світлана Андріївна',
   },
   {
+    id: 5,
     service: 'Рентген хребта',
     appointmentDate: new Date(2022, 4, 20, 16, 30).getTime(),
     status: 'Запланований',
@@ -50,6 +56,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Мельник Сергій Дмитрович',
   },
   {
+    id: 6,
     service: 'Консультація кардіолога',
     appointmentDate: new Date(2021, 11, 2, 11, 0).getTime(),
     status: 'Завершений',
@@ -57,6 +64,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Гаврилюк Олена Вікторівна',
   },
   {
+    id: 7,
     service: 'Ехокардіографія',
     appointmentDate: new Date(2021, 9, 25, 14, 10).getTime(),
     status: 'Завершений',
@@ -64,6 +72,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Гаврилюк Олена Вікторівна',
   },
   {
+    id: 8,
     service: 'Загальний аналіз крові',
     appointmentDate: new Date(2023, 1, 5, 8, 30).getTime(),
     status: 'Завершений',
@@ -71,6 +80,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Лабораторія №1',
   },
   {
+    id: 9,
     service: 'Консультація ортопеда',
     appointmentDate: new Date(2023, 1, 8, 9, 0).getTime(),
     status: 'Скасований',
@@ -78,6 +88,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Стеценко Павло Анатолійович',
   },
   {
+    id: 10,
     service: 'Флюорографія',
     appointmentDate: new Date(2022, 10, 15, 13, 0).getTime(),
     status: 'Запланований',
@@ -85,6 +96,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Рентген-кабінет №2',
   },
   {
+    id: 11,
     service: 'Консультація терапевта',
     appointmentDate: new Date(2023, 2, 1, 10, 30).getTime(),
     status: 'Завершений',
@@ -92,6 +104,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Демченко Катерина Ігорівна',
   },
   {
+    id: 12,
     service: 'Аналіз сечі',
     appointmentDate: new Date(2023, 2, 10, 8, 45).getTime(),
     status: 'Завершений',
@@ -99,6 +112,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Лабораторія №2',
   },
   {
+    id: 13,
     service: 'Консультація стоматолога',
     appointmentDate: new Date(2022, 6, 21, 15, 0).getTime(),
     status: 'Запланований',
@@ -106,6 +120,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Романенко Валерій Григорович',
   },
   {
+    id: 14,
     service: 'Консультація офтальмолога',
     appointmentDate: new Date(2023, 4, 3, 12, 0).getTime(),
     status: 'Завершений',
@@ -113,6 +128,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Іващенко Наталія Петрівна',
   },
   {
+    id: 15,
     service: 'УЗД нирок',
     appointmentDate: new Date(2023, 5, 7, 11, 15).getTime(),
     status: 'Скасований',
@@ -120,6 +136,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Петров Вадим Олександрович',
   },
   {
+    id: 16,
     service: 'Колоноскопія',
     appointmentDate: new Date(2023, 6, 14, 9, 30).getTime(),
     status: 'Запланований',
@@ -127,6 +144,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Василенко Олег Григорович',
   },
   {
+    id: 17,
     service: 'Консультація ендокринолога',
     appointmentDate: new Date(2023, 7, 1, 14, 0).getTime(),
     status: 'Завершений',
@@ -134,6 +152,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Бондаренко Ірина Миколаївна',
   },
   {
+    id: 18,
     service: 'Аналіз крові на цукор',
     appointmentDate: new Date(2023, 7, 1, 8, 0).getTime(),
     status: 'Завершений',
@@ -141,6 +160,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Лабораторія №3',
   },
   {
+    id: 19,
     service: 'Консультація психолога',
     appointmentDate: new Date(2023, 8, 10, 16, 0).getTime(),
     status: 'Запланований',
@@ -148,6 +168,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Баранов Андрій Павлович',
   },
   {
+    id: 20,
     service: 'Консультація дієтолога',
     appointmentDate: new Date(2023, 9, 5, 10, 45).getTime(),
     status: 'Скасований',
@@ -155,6 +176,7 @@ export const appointmentsTestData: AppointmentsRegistryEntryDto[] = [
     doctorName: 'Гончарова Лілія Сергіївна',
   },
   {
+    id: 21,
     service: 'Мамографія',
     appointmentDate: new Date(2023, 10, 20, 11, 30).getTime(),
     status: 'Запланований',

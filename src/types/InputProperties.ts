@@ -12,4 +12,5 @@ export interface InputProperties {
   register?: UseFormRegisterReturn;
   error?: string;
   disabled?: boolean;
+  cancelId?: number;
 }

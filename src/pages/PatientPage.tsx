@@ -284,6 +284,9 @@ const PatientPage = () => {
                           fontWeight: 200,
                           fontSize: '1.2rem',
                         }}
+                        cancelId={
+                          a.status === 'Запланований' ? a.id : undefined
+                        }
                       />
                       <Input
                         type="text"
