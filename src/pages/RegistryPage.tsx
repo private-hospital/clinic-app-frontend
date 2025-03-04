@@ -138,7 +138,7 @@ const RegistryPage = () => {
             {data &&
               data.entries.map((p) => {
                 return (
-                  <tr>
+                  <tr onClick={() => navigate(`/patient/${p.id}`)}>
                     <td>{p.id}</td>
                     <td>{p.fullname}</td>
                     <td>{p.phone}</td>

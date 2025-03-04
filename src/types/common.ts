@@ -20,3 +20,7 @@ export class ApiError extends Error {
     this.errorType = errorResponse.errorType;
   }
 }
+
+export interface RouteParams {
+  [key: string]: string | undefined;
+}

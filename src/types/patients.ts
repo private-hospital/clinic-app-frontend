@@ -17,6 +17,20 @@ export interface PatientsRegistryEntryDto {
   benefit: string;
 }
 
+export const patientEditSchema = z.object({
+  lastName: z.string().min(1, 'Прізвище є обов’язковим'),
+  firstName: z.string().min(1, 'Ім’я є обов’язковим'),
+  middleName: z.string().optional(),
+  phone: z.string().min(1, 'Номер телефону є обов’язковим'),
+  email: z.string().email('Некоректна електронна пошта'),
+  dob: z.string().min(1, 'Дата народження є обов’язковою'),
+  sex: z.enum(['MALE', 'FEMALE'], {
+    required_error: 'Будь ласка, оберіть стать',
+  }),
+});
+
+export type PatientEditFormData = z.infer<typeof patientEditSchema>;
+
 export const stepOneSchema = z.object({
   lastName: z.string().nonempty('Введіть прізвище'),
   firstName: z.string().nonempty('Введіть ім’я'),
