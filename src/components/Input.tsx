@@ -3,7 +3,7 @@ import '../styles/Input.css';
 
 const Input = (p: InputProperties) => {
   return (
-    <div>
+    <div style={{ margin: 0, marginBottom: '0.5rem' }}>
       <div className="labels-holder">
         <label htmlFor={p.inputId} className="label-text">
           {p.label}
@@ -15,6 +15,7 @@ const Input = (p: InputProperties) => {
         type={p.type}
         placeholder={p.placeholder}
         style={p.css}
+        value={p.value && p.value}
         className={p.error ? 'input-error' : ''}
         {...p.register}
         disabled={!!p.disabled}

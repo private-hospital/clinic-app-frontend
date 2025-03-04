@@ -8,7 +8,7 @@ export interface InputProperties {
   inputId: string;
   css?: CSSProperties;
   // setValue?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  // value: string;
+  value?: string;
   register?: UseFormRegisterReturn;
   error?: string;
   disabled?: boolean;

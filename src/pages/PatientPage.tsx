@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
+import { appointmentsTestData } from '../types/appointments';
 
 const PatientPage = () => {
   const navigate = useNavigate();
@@ -76,6 +77,19 @@ const PatientPage = () => {
   const onSubmit = (data: PatientEditFormData) => {
     console.log('Form data:', data);
     toast.success('Пацієнта збережено');
+  };
+
+  const formatDate = (timestamp: number): string => {
+    const dateObj = new Date(timestamp);
+
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
   };
 
   return (
@@ -199,9 +213,113 @@ const PatientPage = () => {
             )}
           </div>
           <div className="sub-info-block">
-            <h3>Візити до лікаря</h3>
+            <div className="directions-block">
+              <h3>Візити до лікаря</h3>
+
+              <div className="visits-list">
+                {appointmentsTestData?.length ? (
+                  appointmentsTestData.map((a, index) => (
+                    <div className="visit-card" key={index}>
+                      <Input
+                        type="text"
+                        label="Назва послуги"
+                        placeholder=""
+                        inputId={`serviceName-${index}`}
+                        value={a.service}
+                        disabled={true}
+                        css={{
+                          color: 'black',
+                          fontWeight: 200,
+                          fontSize: '1.2rem',
+                        }}
+                      />
+                      <Input
+                        type="text"
+                        label="Дата прийому"
+                        placeholder=""
+                        inputId={`aDate-${index}`}
+                        value={formatDate(a.appointmentDate)}
+                        disabled={true}
+                        css={{
+                          color: 'black',
+                          fontWeight: 200,
+                          fontSize: '1.2rem',
+                        }}
+                      />
+                      <Input
+                        type="text"
+                        label="Статус прийому"
+                        placeholder=""
+                        inputId={`status-${index}`}
+                        value={a.status}
+                        disabled={true}
+                        css={{
+                          color:
+                            a.status === 'Завершений'
+                              ? '#00b11d'
+                              : a.status === 'Запланований'
+                                ? '#4699e6'
+                                : '#c70000',
+                          fontWeight: 200,
+                          fontSize: '1.2rem',
+                        }}
+                      />
+                      <Input
+                        type="text"
+                        label="Вартість послуг, грн"
+                        placeholder=""
+                        inputId={`price-${index}`}
+                        value={a.price?.toString() || '-'}
+                        disabled={true}
+                        css={{
+                          color: 'black',
+                          fontWeight: 200,
+                          fontSize: '1.2rem',
+                        }}
+                      />
+                      <Input
+                        type="text"
+                        label="ПІБ лікаря"
+                        placeholder=""
+                        inputId={`doctorName-${index}`}
+                        value={a.doctorName}
+                        disabled={true}
+                        css={{
+                          color: 'black',
+                          fontWeight: 200,
+                          fontSize: '1.2rem',
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p>Немає візитів</p>
+                )}
+              </div>
+
+              <Button
+                type="primary"
+                text="Новий запис до лікаря"
+                isSubmit={false}
+                css={{
+                  width: 'fit-content',
+                  fontSize: '1.3rem',
+                  fontWeight: 300,
+                  paddingLeft: '3rem',
+                  paddingRight: '3rem',
+                  height: '3.2rem',
+                }}
+              />
+            </div>
           </div>
         </div>
+
+        <h2
+          className="page-title"
+          style={{ marginTop: '2rem', marginBottom: '2rem' }}
+        >
+          Медичні записи пацієнта
+        </h2>
       </div>
     </div>
   );
