@@ -75,7 +75,7 @@ const RegistryPage = () => {
 
   useEffect(() => {
     setData(fetchData);
-  }, [data, setData, page, setPage, fetchData]);
+  }, [page, setData]);
 
   return (
     <div className="auth-body">
@@ -99,18 +99,20 @@ const RegistryPage = () => {
                 placeholder="Пошук"
               />
             </div>
-            <button className="add-btn">
-              <span
-                style={{
-                  fontSize: '1.5rem',
-                  marginRight: '0.8rem',
-                  fontWeight: 200,
-                }}
-              >
-                +
-              </span>{' '}
-              Додати пацієнта
-            </button>
+            {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
+              <button className="add-btn">
+                <span
+                  style={{
+                    fontSize: '1.5rem',
+                    marginRight: '0.8rem',
+                    fontWeight: 200,
+                  }}
+                >
+                  +
+                </span>{' '}
+                Додати пацієнта
+              </button>
+            )}
           </div>
         </div>
         <table className="registry-table">
