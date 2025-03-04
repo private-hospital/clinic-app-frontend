@@ -31,6 +31,30 @@
     justify-content: space-between;
 }
 
+@media (max-width: 1200px) {
+    .controls-block {
+        height: 10rem;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 2rem;
+    }
+    .buttons-holder {
+        flex-direction: column;
+        height: 7rem;
+        align-items: flex-start;
+    }
+    .search-box {
+        width: 80vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        width: 70vw;
+    }
+
+}
+
 .add-btn:active {
     transform: scale(0.98);
 }
