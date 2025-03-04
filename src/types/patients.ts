@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface PatientsRegistryDto {
   entries: PatientsRegistryEntryDto[];
   page: number;
@@ -14,6 +16,29 @@ export interface PatientsRegistryEntryDto {
   sex: string;
   benefit: string;
 }
+
+export const stepOneSchema = z.object({
+  lastName: z.string().nonempty('Введіть прізвище'),
+  firstName: z.string().nonempty('Введіть ім’я'),
+  middleName: z.string().optional(),
+  phone: z.string().nonempty('Введіть номер телефону'),
+  email: z.string().nonempty('Введіть email').email('Неправильний формат'),
+  dob: z.string().nonempty('Введіть дату народження'),
+  sex: z.enum(['MALE', 'FEMALE'], {
+    errorMap: () => ({ message: 'Оберіть стать' }),
+  }),
+});
+
+export const stepTwoSchema = z.object({
+  verificationCode: z
+    .string()
+    .nonempty('Введіть код підтвердження')
+    .min(6, 'Закороткий код'),
+});
+
+export const stepThreeSchema = z.object({
+  discountGroup: z.string().optional(),
+});
 
 export const patientsTestData: PatientsRegistryEntryDto[] = [
   {

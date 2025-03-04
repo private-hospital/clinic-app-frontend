@@ -8,8 +8,11 @@ import '../styles/authPages.css';
 import '../styles/RegistryPage.css';
 import { PatientsRegistryDto, patientsTestData } from '../types/patients';
 import Pagination from '../components/Pagination';
+import PatientRegistrationForm from '../components/PatientRegistrationForm';
 
 const RegistryPage = () => {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
   useEffect(() => {
@@ -80,6 +83,10 @@ const RegistryPage = () => {
   return (
     <div className="auth-body">
       <Header />
+      <PatientRegistrationForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+      />
       <div className="registry-holder">
         <div className="controls-block">
           <h1 className="page-title">Реєстр пацієнтів</h1>
@@ -100,7 +107,7 @@ const RegistryPage = () => {
               />
             </div>
             {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
-              <button className="add-btn">
+              <button className="add-btn" onClick={() => setIsFormOpen(true)}>
                 <span
                   style={{
                     fontSize: '1.5rem',
