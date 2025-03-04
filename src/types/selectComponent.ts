@@ -15,4 +15,5 @@ export interface SelectProperties {
   options: SelectOption[];
   disabled?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value?: string;
 }

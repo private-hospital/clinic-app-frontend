@@ -7,16 +7,19 @@ import { toast } from 'react-toastify';
 import { LoginFormDto, loginSchema } from '../types/auth';
 import { goToMainPage } from '../service/navigationUtils';
 import { useNavigate } from 'react-router';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { AuthContext } from '../components/AuthContext';
 import { getTokenPayload } from '../service/authUtils';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
-  if (authCtx.tokenPayload) {
-    goToMainPage(navigate, authCtx.tokenPayload.role);
-  }
+
+  useEffect(() => {
+    if (authCtx.tokenPayload) {
+      goToMainPage(navigate, authCtx.tokenPayload.role);
+    }
+  }, [authCtx.tokenPayload, navigate]);
 
   const {
     register,

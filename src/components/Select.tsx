@@ -21,6 +21,7 @@ const Select: React.FC<SelectProperties> = (p) => {
         {...(p.register ? p.register : {})}
         disabled={!!p.disabled}
         onChange={p.onChange}
+        value={p.value}
       >
         {p.options.map((opt) => (
           <option key={opt.value} value={opt.value}>
