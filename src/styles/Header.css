@@ -14,6 +14,10 @@ header {
     margin: 0 0 0 2rem;
 }
 
+.header-logo-img:hover {
+    cursor: pointer;
+}
+
 .buttons-block {
     flex-basis: 65%;
     display: flex;

@@ -24,6 +24,10 @@ const Header = () => {
         src={import.meta.env.VITE_CDN_BASE_URL + '/svg/logo.svg'}
         className="header-logo-img"
         alt="Blue VitaLine Logo"
+        onClick={() => goToMainPage(navigate, authCtx.tokenPayload?.role)}
+        onFocus={() => {}}
+        onKeyDown={() => {}}
+        onMouseOver={() => {}}
       />
       <div className="buttons-block">
         {getAllowedPages(authCtx).map((b) => {
