@@ -21,12 +21,12 @@ export interface ServiceFormProps {
 }
 
 export const newServiceSchema = z.object({
-  serviceName: z.string().nonempty('Введіть назву послуги'),
+  serviceName: z.string().nonempty('Назва послуги має бути вказана'),
   price: z
     .number({
-      invalid_type_error: 'Ціна повинна бути числом',
+      invalid_type_error: 'Ціна послуги має бути вказана',
     })
-    .min(0, 'Введіть додатну ціну'),
+    .nonnegative('Ціна не може бути відʼємною'),
 });
 
 export type NewServiceDto = z.infer<typeof newServiceSchema>;
