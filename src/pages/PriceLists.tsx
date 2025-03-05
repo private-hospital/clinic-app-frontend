@@ -18,6 +18,7 @@ import { ServiceRegistryDto, serviceRegistryTestData } from '../types/services';
 import Button from '../components/Button';
 import { toast } from 'react-toastify';
 import ServiceForm from '../components/ServiceForm';
+import ArchivePriceListForm from '../components/ArchivePriceListForm';
 
 const PriceLists = () => {
   const navigate = useNavigate();
@@ -30,6 +31,24 @@ const PriceLists = () => {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [isPLFormOpen, setIsPLFormOpen] = useState(false);
   const [isSFormOpen, setIsSFormOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [archivePLId, setArchivePLId] = useState<number | null>(null);
+
+  const handleArchivePL = (id: number): void => {
+    setArchivePLId(id);
+    setIsArchiveModalOpen(true);
+    toast.success('Прайс лист був успішно архівований');
+  };
+
+  const archivePriceList = (reason: string) => {
+    if (archivePLId == null) return;
+
+    console.log(`Archiving price list #${archivePLId} with reason: ${reason}`);
+    // TODO: Implement API call or state update
+
+    toast.success('Прайс лист був успішно архівований');
+    setIsArchiveModalOpen(false);
+  };
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -110,12 +129,6 @@ const PriceLists = () => {
     toggleDropdown(id);
   };
 
-  const handleArchivePL = (id: number): void => {
-    console.log(id);
-    toast.success('Прайс лист був успішно архівований');
-    toggleDropdown(id);
-  };
-
   const formatDate = (ts: number): string => {
     const date = new Date(ts);
     const day = String(date.getDate()).padStart(2, '0');
@@ -132,6 +145,11 @@ const PriceLists = () => {
       <PriceListForm
         isOpen={isPLFormOpen}
         onClose={() => setIsPLFormOpen(false)}
+      />
+      <ArchivePriceListForm
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        onArchive={archivePriceList}
       />
       <ServiceForm isOpen={isSFormOpen} onClose={() => setIsSFormOpen(false)} />
       <div className="a-registry-holder">
@@ -232,7 +250,10 @@ const PriceLists = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleArchivePL(p.id)}
+                            onClick={() => {
+                              handleArchivePL(p.id);
+                              toggleDropdown(p.id);
+                            }}
                           >
                             Архівувати
                           </button>

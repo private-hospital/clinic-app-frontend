@@ -15,8 +15,8 @@ import '../styles/PriceListForm.css';
 const priceListSchema = z.object({
   entries: z.record(
     z
-      .number({ invalid_type_error: 'Введіть ціну' })
-      .min(0, "Ціна не може бути від'ємною"),
+      .number({ invalid_type_error: 'Ціна послуги має бути вказана' })
+      .nonnegative("Ціна не може бути від'ємною"),
   ),
 });
 
@@ -79,7 +79,7 @@ const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          Додавання прайс-листа
+          Створення нового прайс-листа
         </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -110,7 +110,7 @@ const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
           ))}
           <Button
             type="primary"
-            text="Оновити прайс-лист"
+            text="Зберегти"
             isSubmit={true}
             css={{
               width: 'fit-content',

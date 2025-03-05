@@ -51,7 +51,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          Додавання послуги
+          Додавання нової послуги
         </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -64,7 +64,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
         >
           <Input
             type="text"
-            label="Назва послуги"
+            label="Назва"
             inputId="serviceName"
             placeholder="Введіть назву послуги"
             error={errors.serviceName?.message}
@@ -82,7 +82,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
           />
           <Button
             type="primary"
-            text="Додати послугу"
+            text="Зберегти"
             isSubmit={true}
             css={{
               width: 'fit-content',

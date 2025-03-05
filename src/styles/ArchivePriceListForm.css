@@ -1,0 +1,46 @@
+.apl-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.apl-modal-content {
+    position: relative;
+    background: #fff;
+    width: 30vw;
+    min-width: 600px;
+    max-width: 90%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+    margin-top: 5vh;
+}
+
+.apl-modal-content h2 {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 600;
+    color: black;
+    font-family: MazzardH, sans-serif;
+}
+
+.apl-modal-close {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 4rem;
+    font-weight: 100;
+    color: #595959;
+}
