@@ -15,6 +15,25 @@ import {
 import '../styles/Statements.css';
 
 const Statements = () => {
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+
+  const toggleDropdown = (id: number) => {
+    setOpenDropdownId((prev) => (prev === id ? null : id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.dropdown-menu') && !target.closest('.dots-icon')) {
+        setOpenDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
   const [page, setPage] = useState(1);
@@ -93,7 +112,7 @@ const Statements = () => {
         <div className="s-controls-block">
           <h1 className="s-page-title">Відомості</h1>
           <div className="s-buttons-holder">
-            {/*  TODO: Add filter button here */}
+            {/* TODO: Add filter button here */}
           </div>
         </div>
         <table className="s-registry-table">
@@ -113,7 +132,7 @@ const Statements = () => {
             {data &&
               data.entries.map((p) => {
                 return (
-                  <tr>
+                  <tr key={p.id}>
                     <td>{p.id}</td>
                     <td>{p.service}</td>
                     <td>{p.patientName}</td>
@@ -138,31 +157,30 @@ const Statements = () => {
                             : 'Скасовано'}
                       </div>
                     </td>
-                    {/*<td>*/}
-                    {/*  {status === AppointmentStatuses.PLANNED && (*/}
-                    {/*    <Button*/}
-                    {/*      type={*/}
-                    {/*        new Date() > new Date(p.appointmentDate)*/}
-                    {/*          ? 'primary'*/}
-                    {/*          : 'secondary'*/}
-                    {/*      }*/}
-                    {/*      text="Завершити огляд / процедуру"*/}
-                    {/*      isSubmit={false}*/}
-                    {/*      disabled={new Date() < new Date(p.appointmentDate)}*/}
-                    {/*      css={{*/}
-                    {/*        width: 'fit-content',*/}
-                    {/*        fontSize: '1rem',*/}
-                    {/*        height: '2.7rem',*/}
-                    {/*        paddingLeft: '2rem',*/}
-                    {/*        paddingRight: '2rem',*/}
-                    {/*        fontWeight: 300,*/}
-                    {/*      }}*/}
-                    {/*      onClick={() =>*/}
-                    {/*        toast.success('Надання послуги успішно завершено')*/}
-                    {/*      }*/}
-                    {/*    />*/}
-                    {/*  )}*/}
-                    {/*</td>*/}
+                    <td className="icon-cell">
+                      {openDropdownId === p.id && (
+                        <div
+                          className="dropdown-menu"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => window.open(p.invoiceUrl)}
+                          >
+                            Завантажити рахунок
+                          </button>
+                        </div>
+                      )}
+                      <img
+                        src={`${import.meta.env.VITE_CDN_BASE_URL}/svg/dots.svg`}
+                        alt="dots icon"
+                        className="dots-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDropdown(p.id);
+                        }}
+                      />
+                    </td>
                   </tr>
                 );
               })}

@@ -317,4 +317,3 @@ export const statementsTestData: StatementRegistryEntryDto[] = [
     invoiceUrl: 'https://cdn.vitalineph.com/sample.pdf',
   },
 ];
-
