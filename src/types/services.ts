@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface ServiceRegistryEntryDto {
   id: number;
   title: string;
@@ -12,6 +14,22 @@ export interface ServiceRegistryDto {
   perPage: number;
   totalPages: number;
 }
+
+export interface ServiceFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const newServiceSchema = z.object({
+  serviceName: z.string().nonempty('Введіть назву послуги'),
+  price: z
+    .number({
+      invalid_type_error: 'Ціна повинна бути числом',
+    })
+    .min(0, 'Введіть додатну ціну'),
+});
+
+export type NewServiceDto = z.infer<typeof newServiceSchema>;
 
 export const serviceRegistryTestData: ServiceRegistryEntryDto[] = [
   {

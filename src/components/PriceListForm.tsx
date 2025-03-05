@@ -65,7 +65,7 @@ const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          Оновлення прайс-листа
+          Додавання прайс-листа
         </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}

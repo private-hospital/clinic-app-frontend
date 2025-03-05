@@ -17,6 +17,7 @@ import PriceListForm from '../components/PriceListForm';
 import { ServiceRegistryDto, serviceRegistryTestData } from '../types/services';
 import Button from '../components/Button';
 import { toast } from 'react-toastify';
+import ServiceForm from '../components/ServiceForm';
 
 const PriceLists = () => {
   const navigate = useNavigate();
@@ -120,6 +121,7 @@ const PriceLists = () => {
         isOpen={isPLFormOpen}
         onClose={() => setIsPLFormOpen(false)}
       />
+      <ServiceForm isOpen={isSFormOpen} onClose={() => setIsSFormOpen(false)} />
       <div className="a-registry-holder">
         <div className="a-controls-block">
           <h1 className="a-page-title">Прайс-листи</h1>
