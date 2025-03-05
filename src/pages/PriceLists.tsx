@@ -21,6 +21,7 @@ const PriceLists = () => {
   const [isArchived, setIsArchived] = useState(false);
   const [data, setData] = useState<PriceListRegistryDto | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -84,6 +85,23 @@ const PriceLists = () => {
         <div className="a-controls-block">
           <h1 className="a-page-title">Прайс-листи</h1>
           <div className="a-buttons-holder">
+            {!isArchived && (
+              <button
+                className="pl-add-btn"
+                onClick={() => setIsFormOpen(true)}
+              >
+                <span
+                  style={{
+                    fontSize: '1.5rem',
+                    marginRight: '0.8rem',
+                    fontWeight: 200,
+                  }}
+                >
+                  +
+                </span>
+                Створити прайс-лист
+              </button>
+            )}
             <Select
               label=""
               selectId="appointment-status"
@@ -98,11 +116,11 @@ const PriceLists = () => {
                   value: 'true',
                 },
               ]}
-              css={{ fontSize: '1rem', height: '3rem' }}
+              css={{ fontSize: '1rem', height: '2.5rem' }}
             />
           </div>
         </div>
-        <table className="a-registry-table">
+        <table className="pl-registry-table">
           <thead>
             <tr>
               <th>ID</th>
