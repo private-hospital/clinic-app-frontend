@@ -43,24 +43,23 @@ const PatientPage = () => {
   const fetchPatient = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`,
       );
-  
+
       if (!response.ok) {
         throw new Error('Не вдалося отримати дані пацієнта');
       }
-  
+
       const patientData: PatientsRegistryEntryDto = await response.json();
       setP(patientData);
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   useEffect(() => {
     fetchPatient();
   }, [id]);
-  
 
   const {
     register,

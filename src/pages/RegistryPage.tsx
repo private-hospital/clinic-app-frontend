@@ -28,13 +28,13 @@ const RegistryPage = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/public/registry/`, 
+        `${import.meta.env.VITE_API_BASE_URL}/public/registry/`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (!response.ok) {
