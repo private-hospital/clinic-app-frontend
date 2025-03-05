@@ -91,11 +91,31 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
     setStep(3);
   };
 
-  const onSubmitStep3 = (data: StepThreeData) => {
-    const d = { ...patientData, ...data } as PatientData;
-    console.log(d);
-    toast.success('Пацієнт був успішно доданий');
-    decOnClose();
+  const onSubmitStep3 = async (data: StepThreeData) => {
+    const finalData = { ...patientData, ...data } as PatientData;
+    console.log(finalData);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/patients`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(finalData),
+        },
+      );
+
+      if (response.ok) {
+        toast.success('Пацієнт був успішно доданий');
+        decOnClose();
+      } else {
+        throw new Error('Помилка при додаванні пацієнта');
+      }
+    } catch (error) {
+      toast.error('Не вдалося додати пацієнта');
+      console.error('Error:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -179,8 +199,8 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               error={errorsStep1.sex?.message}
               register={registerStep1('sex')}
               options={[
-                { label: 'Чоловік', value: 'MALE' },
-                { label: 'Жінка', value: 'FEMALE' },
+                { label: 'Чоловіча', value: 'MALE' },
+                { label: 'Жіноча', value: 'FEMALE' },
               ]}
             />
 
@@ -316,11 +336,14 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               <label htmlFor="benefit">Пільгова група (необов’язково)</label>
               <select id="benefit" {...registerStep3('benefit')}>
                 <option value="">Без пільг</option>
-                <option value="family">
+                <option value="military">Військові (знижка 20%)</option>
+                <option value="elderly">Люди похилого віку (знижка 10%)</option>
+                <option value="disabled">
+                  Люди з інвалідністю (знижка 5%)
+                </option>
+                <option value="staff_family">
                   Члени родин працівників (знижка 40%)
                 </option>
-                <option value="students">Студенти (знижка 20%)</option>
-                <option value="pensioners">Пенсіонери (знижка 30%)</option>
               </select>
               {errorsStep3.benefit && (
                 <span style={{ color: 'red' }}>
