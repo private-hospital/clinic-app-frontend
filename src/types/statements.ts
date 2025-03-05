@@ -25,6 +25,10 @@ export interface StatementFilterPropsDto {
   order?: 'asc' | 'desc';
 }
 
+export interface AllowedServicesForStatementFilterDto {
+  services: string[];
+}
+
 export const statementsTestData: StatementRegistryEntryDto[] = [
   {
     id: 1,

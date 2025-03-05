@@ -13,8 +13,12 @@ import {
   statementsTestData,
 } from '../types/statements';
 import '../styles/Statements.css';
+import Button from '../components/Button';
+import FilterButton from '../components/FilterButton';
+import FilterModal from '../components/FilterModal';
 
 const Statements = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
   const toggleDropdown = (id: number) => {
@@ -95,6 +99,10 @@ const Statements = () => {
     });
   }, [page, filterProps]);
 
+  const downloadStatement = () => {
+    window.open('https://cdn.vitalineph.com/sample.pdf');
+  };
+
   const formatDate = (ts: number): string => {
     const date = new Date(ts);
     const day = String(date.getDate()).padStart(2, '0');
@@ -108,11 +116,35 @@ const Statements = () => {
   return (
     <div className="auth-body">
       <Header />
+      <FilterModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onApply={(newFilter) => {
+          setFilterProps((prev) => ({
+            ...prev,
+            ...newFilter,
+          }));
+        }}
+      />
       <div className="s-registry-holder">
         <div className="s-controls-block">
           <h1 className="s-page-title">Відомості</h1>
           <div className="s-buttons-holder">
-            {/* TODO: Add filter button here */}
+            <Button
+              type="primary"
+              text="Завантажити відомість"
+              isSubmit={false}
+              onClick={downloadStatement}
+              css={{
+                width: 'fit-content',
+                height: '3rem',
+                fontSize: '1rem',
+                fontWeight: 300,
+                paddingLeft: '2rem',
+                paddingRight: '2rem',
+              }}
+            />
+            <FilterButton onClick={() => setIsModalOpen(true)} />
           </div>
         </div>
         <table className="s-registry-table">
