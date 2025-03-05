@@ -6,79 +6,56 @@ import { UserRoles } from '../types/users';
 import Header from '../components/Header';
 import '../styles/authPages.css';
 import '../styles/RegistryPage.css';
-import { PatientsRegistryDto, patientsTestData } from '../types/patients';
+import { PatientsRegistryDto } from '../types/patients';
 import Pagination from '../components/Pagination';
 import PatientRegistrationForm from '../components/PatientRegistrationForm';
 
 const RegistryPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-
+  const [data, setData] = useState<PatientsRegistryDto | null>(null);
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
+
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
   }, [navigate, authCtx]);
 
-  const handleSearchBarChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
+  const handleSearchBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
   };
 
-  const [page, setPage] = useState(1);
-  const [data, setData] = useState<PatientsRegistryDto | null>(null);
-  const fetchData = (): PatientsRegistryDto => {
-    if (page === 1) {
-      return {
-        entries: patientsTestData.slice(0, 10),
-        page: 1,
-        perPage: 10,
-        totalPages: 4,
-      };
-    }
-    if (page === 2) {
-      return {
-        entries: patientsTestData.slice(10, 20),
-        page: 2,
-        perPage: 10,
-        totalPages: 4,
-      };
-    }
-    if (page === 3) {
-      return {
-        entries: patientsTestData.slice(20, 30),
-        page: 3,
-        perPage: 10,
-        totalPages: 4,
-      };
-    }
-    if (page === 4) {
-      return {
-        entries: patientsTestData.slice(30, 36),
-        page: 4,
-        perPage: 10,
-        totalPages: 4,
-      };
-    }
-    return {
-      entries: [],
-      page: 1,
-      perPage: 0,
-      totalPages: 1,
-    };
-  };
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/registry/`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-  const formatDate = (ts: number): string => {
-    const date = new Date(ts);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setData({
+        entries: data,
+        page,
+        perPage: 10,
+        totalPages: Math.ceil(data.length / 10),
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   useEffect(() => {
-    setData(fetchData);
-  }, [page, setData]);
+    fetchData();
+  }, [page]);
 
   return (
     <div className="auth-body">
@@ -138,12 +115,12 @@ const RegistryPage = () => {
             {data &&
               data.entries.map((p) => {
                 return (
-                  <tr onClick={() => navigate(`/patient/${p.id}`)}>
+                  <tr onClick={() => navigate(`/patient/${p.id}`)} key={p.id}>
                     <td>{p.id}</td>
                     <td>{p.fullname}</td>
                     <td>{p.phone}</td>
                     <td>{p.email}</td>
-                    <td>{formatDate(p.dob)}</td>
+                    <td>{p.dob}</td>
                     <td>{p.sex}</td>
                     <td>{p.benefit}</td>
                   </tr>

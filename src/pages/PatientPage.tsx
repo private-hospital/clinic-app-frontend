@@ -10,7 +10,6 @@ import {
   PatientEditFormData,
   patientEditSchema,
   PatientsRegistryEntryDto,
-  patientsTestData,
 } from '../types/patients';
 import { RouteParams } from '../types/common';
 import { useForm } from 'react-hook-form';
@@ -41,9 +40,27 @@ const PatientPage = () => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
   }, [navigate, authCtx]);
 
+  const fetchPatient = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`
+      );
+  
+      if (!response.ok) {
+        throw new Error('Не вдалося отримати дані пацієнта');
+      }
+  
+      const patientData: PatientsRegistryEntryDto = await response.json();
+      setP(patientData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   useEffect(() => {
-    setP(patientsTestData.find((p) => p.id === id));
-  }, [setP, id]);
+    fetchPatient();
+  }, [id]);
+  
 
   const {
     register,
