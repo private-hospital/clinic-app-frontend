@@ -56,6 +56,7 @@ const Input = (p: InputProperties) => {
           {...p.register}
           disabled={!!p.disabled}
           onChange={p.onChange}
+          defaultValue={p.defaultValue}
         />
       </div>
     );
@@ -88,6 +89,7 @@ const Input = (p: InputProperties) => {
           {...p.register}
           disabled={!!p.disabled}
           onChange={p.onChange}
+          defaultValue={p.defaultValue}
         />
         <img
           src={`${import.meta.env.VITE_CDN_BASE_URL}/svg/dots.svg`}
