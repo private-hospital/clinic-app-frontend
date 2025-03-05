@@ -100,7 +100,11 @@ const Statements = () => {
   }, [page, filterProps]);
 
   const downloadStatement = () => {
-    window.open('https://cdn.vitalineph.com/sample.pdf');
+    window.open(
+      'https://cdn.vitalineph.com/sample.pdf',
+      'Statement',
+      'noopener',
+    );
   };
 
   const formatDate = (ts: number): string => {
@@ -197,7 +201,13 @@ const Statements = () => {
                         >
                           <button
                             type="button"
-                            onClick={() => window.open(p.invoiceUrl)}
+                            onClick={() => {
+                              window.open(
+                                p.invoiceUrl,
+                                'Statement',
+                                'noopener',
+                              );
+                            }}
                           >
                             Завантажити рахунок
                           </button>
