@@ -13,6 +13,7 @@ import {
   priceListsTestData,
 } from '../types/priceLists';
 import '../styles/PriceLists.css';
+import PriceListForm from '../components/PriceListForm';
 
 const PriceLists = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const PriceLists = () => {
   const [isArchived, setIsArchived] = useState(false);
   const [data, setData] = useState<PriceListRegistryDto | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPLFormOpen, setIsPLFormOpen] = useState(false);
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -81,6 +82,10 @@ const PriceLists = () => {
   return (
     <div className="auth-body">
       <Header />
+      <PriceListForm
+        isOpen={isPLFormOpen}
+        onClose={() => setIsPLFormOpen(false)}
+      />
       <div className="a-registry-holder">
         <div className="a-controls-block">
           <h1 className="a-page-title">Прайс-листи</h1>
@@ -88,7 +93,7 @@ const PriceLists = () => {
             {!isArchived && (
               <button
                 className="pl-add-btn"
-                onClick={() => setIsFormOpen(true)}
+                onClick={() => setIsPLFormOpen(true)}
               >
                 <span
                   style={{
