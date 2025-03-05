@@ -1,0 +1,42 @@
+.pl-dots-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.pl-icon-cell {
+    position: relative;
+    text-align: right;
+    vertical-align: middle;
+    min-width: 30px;
+}
+
+.pl-dropdown-menu {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(-15%, -70%);
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.5rem;
+    min-width: 200px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+}
+
+.pl-dropdown-menu button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.pl-dropdown-menu button:hover {
+    background-color: #f2f2f2;
+}

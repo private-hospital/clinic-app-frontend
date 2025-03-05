@@ -228,6 +228,11 @@ const Statements = () => {
               })}
           </tbody>
         </table>
+        {(!data || data.entries.length === 0) && (
+          <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+            Немає записів
+          </p>
+        )}
         <Pagination
           setPage={setPage}
           page={page}
