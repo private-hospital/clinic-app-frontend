@@ -87,7 +87,11 @@
     border-style: solid;
     border-radius: 25px;
     margin: 0;
-    padding: 0.5rem;
+    padding: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
     width: fit-content;
 }
 

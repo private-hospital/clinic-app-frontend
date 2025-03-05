@@ -14,15 +14,21 @@ import {
 } from '../types/priceLists';
 import '../styles/PriceLists.css';
 import PriceListForm from '../components/PriceListForm';
+import { ServiceRegistryDto, serviceRegistryTestData } from '../types/services';
+import Button from '../components/Button';
+import { toast } from 'react-toastify';
 
 const PriceLists = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
-  const [page, setPage] = useState(1);
+  const [pagePL, setPagePL] = useState<number>(1);
+  const [pageS, setPageS] = useState<number>(1);
   const [isArchived, setIsArchived] = useState(false);
-  const [data, setData] = useState<PriceListRegistryDto | null>(null);
+  const [plData, setPLData] = useState<PriceListRegistryDto | null>(null);
+  const [sData, setSData] = useState<ServiceRegistryDto | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [isPLFormOpen, setIsPLFormOpen] = useState(false);
+  const [isSFormOpen, setIsSFormOpen] = useState(false);
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -49,7 +55,7 @@ const PriceLists = () => {
   }, [navigate, authCtx]);
 
   useEffect(() => {
-    setPage(1);
+    setPagePL(1);
   }, [isArchived]);
 
   useEffect(() => {
@@ -58,16 +64,44 @@ const PriceLists = () => {
       (p) => p.isArchived === isArchived,
     );
     const totalPages = Math.ceil(filteredEntries.length / perPage);
-    const startIndex = (page - 1) * perPage;
+    const startIndex = (pagePL - 1) * perPage;
     const pageEntries = filteredEntries.slice(startIndex, startIndex + perPage);
 
-    setData({
+    setPLData({
       totalPages,
       perPage,
-      page,
+      page: pagePL,
       entries: pageEntries,
     });
-  }, [page, isArchived, setData]);
+  }, [pagePL, isArchived, setPLData]);
+
+  useEffect(() => {
+    const perPage = 10;
+    const totalPages = Math.ceil(serviceRegistryTestData.length / perPage);
+    const startIndex = (pageS - 1) * perPage;
+    const pageEntries = serviceRegistryTestData.slice(
+      startIndex,
+      startIndex + perPage,
+    );
+
+    setSData({
+      totalPages,
+      perPage,
+      page: pageS,
+      entries: pageEntries,
+    });
+  }, [pageS, setSData]);
+
+  const handleUnarchive = (id: number): void => {
+    // TODO unarchive
+    console.log(id);
+    toast.success('Послугу було успішно актуалізовано');
+  };
+
+  const handleArchive = (id: number): void => {
+    console.log(id);
+    toast.success('Послугу було успішно архівовано');
+  };
 
   const formatDate = (ts: number): string => {
     const date = new Date(ts);
@@ -138,8 +172,8 @@ const PriceLists = () => {
           </thead>
           <tbody>
             {isArchived &&
-              data &&
-              data.entries.map((p) => {
+              plData &&
+              plData.entries.map((p) => {
                 return (
                   <tr>
                     <td>{p.id}</td>
@@ -150,8 +184,8 @@ const PriceLists = () => {
                 );
               })}
             {!isArchived &&
-              data &&
-              data.entries.map((p) => {
+              plData &&
+              plData.entries.map((p) => {
                 return (
                   <tr>
                     <td>{p.id}</td>
@@ -201,15 +235,113 @@ const PriceLists = () => {
               })}
           </tbody>
         </table>
-        {(!data || data.entries.length === 0) && (
+        {(!plData || plData.entries.length === 0) && (
           <p style={{ textAlign: 'center', marginTop: '2rem' }}>
             Немає записів
           </p>
         )}
         <Pagination
-          setPage={setPage}
-          page={page}
-          totalPages={data ? data.totalPages : 1}
+          setPage={setPagePL}
+          page={pagePL}
+          totalPages={plData ? plData.totalPages : 1}
+        />
+      </div>
+
+      <div className="a-registry-holder">
+        <div className="a-controls-block">
+          <h1 className="a-page-title">Послуги клініки</h1>
+          <div className="a-buttons-holder">
+            <button className="pl-add-btn" onClick={() => setIsSFormOpen(true)}>
+              <span
+                style={{
+                  fontSize: '1.5rem',
+                  marginRight: '0.8rem',
+                  fontWeight: 200,
+                }}
+              >
+                +
+              </span>
+              Додати послугу
+            </button>
+          </div>
+        </div>
+        <table className="pl-registry-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Назва</th>
+              <th>Вартість, грн</th>
+              <th>Надано (разів)</th>
+              <th>Архівовано</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sData &&
+              sData.entries.map((p) => {
+                return (
+                  <tr>
+                    <td>{p.id}</td>
+                    <td>{p.title}</td>
+                    <td>{p.isArchived ? '-' : p.price}</td>
+                    <td>{p.count}</td>
+                    <td>
+                      <div
+                        className="s-badge"
+                        style={
+                          p.isArchived
+                            ? { color: '#5a5a5a', borderColor: '#5a5a5a' }
+                            : { color: '#00a01a', borderColor: '#00a01a' }
+                        }
+                      >
+                        {p.isArchived ? 'Так' : 'Ні'}
+                      </div>
+                    </td>
+                    <td>
+                      {p.isArchived && (
+                        <Button
+                          type="primary"
+                          text="Дістати з архіву"
+                          isSubmit={false}
+                          onClick={() => handleUnarchive(p.id)}
+                          css={{
+                            width: '100%',
+                            height: '3rem',
+                            fontSize: '1rem',
+                            fontWeight: 300,
+                          }}
+                        />
+                      )}
+                      {!p.isArchived && (
+                        <Button
+                          type="primary"
+                          text="Архівувати"
+                          isSubmit={false}
+                          onClick={() => handleArchive(p.id)}
+                          css={{
+                            width: '100%',
+                            height: '3rem',
+                            fontSize: '1rem',
+                            fontWeight: 300,
+                            backgroundColor: '#c70000',
+                          }}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+        {(!sData || sData.entries.length === 0) && (
+          <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+            Немає записів
+          </p>
+        )}
+        <Pagination
+          setPage={setPageS}
+          page={pageS}
+          totalPages={sData ? sData.totalPages : 1}
         />
       </div>
     </div>
