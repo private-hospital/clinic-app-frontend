@@ -9,6 +9,7 @@ import '../styles/RegistryPage.css';
 import { PatientsRegistryDto } from '../types/patients';
 import Pagination from '../components/Pagination';
 import PatientRegistrationForm from '../components/PatientRegistrationForm';
+import api from '../service/axiosUtils';
 
 const RegistryPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -27,27 +28,11 @@ const RegistryPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/public/registry/`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+      const response = await api.get<PatientsRegistryDto>(
+        `/public/registry?p=${page}&q=10`,
       );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const data = await response.json();
-      setData({
-        entries: data,
-        page,
-        perPage: 10,
-        totalPages: Math.ceil(data.length / 10),
-      });
+      console.log(response);
+      setData(response);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -55,7 +40,7 @@ const RegistryPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page]);
+  }, [page, isFormOpen]);
 
   return (
     <div className="auth-body">

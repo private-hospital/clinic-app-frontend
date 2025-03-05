@@ -24,3 +24,7 @@ export class ApiError extends Error {
 export interface RouteParams {
   [key: string]: string | undefined;
 }
+
+export interface StatusResponseDto {
+  status: string;
+}
