@@ -9,13 +9,15 @@
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
-    "valid": "npm run lint:fix"
+    "valid": "npm run lint:fix && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
+    "@types/d3": "^7.4.3",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/jwt-decode": "^3.1.0",
     "axios": "^1.8.1",
+    "d3": "^7.9.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",

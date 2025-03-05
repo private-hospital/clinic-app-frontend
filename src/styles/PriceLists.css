@@ -1,0 +1,122 @@
+.pl-dots-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.pl-icon-cell {
+    position: relative;
+    text-align: right;
+    vertical-align: middle;
+    min-width: 30px;
+}
+
+.pl-dropdown-menu {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(-15%, -70%);
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.5rem;
+    min-width: 200px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+}
+
+.pl-dropdown-menu button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.pl-dropdown-menu button:hover {
+    background-color: #f2f2f2;
+}
+
+.pl-add-btn:active {
+    transform: scale(0.98);
+}
+
+.pl-add-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 3rem;
+    width: fit-content;
+    box-sizing: border-box;
+    padding: 0 2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 400;
+    background-color: #4699e6;
+    font-family: Roboto, sans-serif;
+    color: white;
+    white-space: nowrap;
+    margin: 0 1rem 0 0;
+}
+
+.pl-registry-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.pl-registry-table thead,
+.pl-registry-table th,
+.pl-registry-table td {
+    border: none;
+    padding-left: 0.8rem;
+}
+
+.pl-registry-table thead {
+    background-color: #cce7ff;
+    height: 4rem;
+    border-radius: 6px;
+}
+
+.pl-registry-table th {
+    font-weight: 400;
+    text-align: left;
+}
+
+.pl-registry-table td {
+    text-align: left;
+}
+
+.pl-registry-table tr {
+    height: 4rem;
+}
+
+.pl-registry-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #cce7ff;
+}
+
+.pl-registry-table th:nth-child(1),
+.pl-registry-table td:nth-child(1) {
+    width: 80px;
+}
+
+.pl-registry-table th:nth-child(3),
+.pl-registry-table td:nth-child(3) {
+    width: 300px;
+}
+
+.pl-registry-table thead tr:first-child th:first-child {
+    border-top-left-radius: 6px;
+}
+
+.pl-registry-table thead tr:first-child th:last-child {
+    border-top-right-radius: 6px;
+}
