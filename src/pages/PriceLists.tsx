@@ -157,7 +157,7 @@ const PriceLists = () => {
                   value: 'true',
                 },
               ]}
-              css={{ fontSize: '1rem', height: '2.5rem' }}
+              css={{ fontSize: '1rem', height: '3rem' }}
             />
           </div>
         </div>

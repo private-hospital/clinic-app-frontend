@@ -1,21 +1,32 @@
-import {
-  currentPriceListTestData,
-  FormValues,
-  NewPriceListDto,
-  PriceListFormProps,
-} from '../types/priceLists';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import Input from './Input';
 import Button from './Button';
+import {
+  currentPriceListTestData,
+  NewPriceListDto,
+  PriceListFormProps,
+} from '../types/priceLists';
 import '../styles/PriceListForm.css';
+
+const priceListSchema = z.object({
+  entries: z.record(
+    z
+      .number({ invalid_type_error: 'Введіть ціну' })
+      .min(0, "Ціна не може бути від'ємною"),
+  ),
+});
+
+export type FormValues = z.infer<typeof priceListSchema>;
 
 const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
   const defaultValues: FormValues = {
     entries: currentPriceListTestData.entries.reduce(
       (acc, service) => {
-        acc[service.serviceId] = service.price;
+        acc[service.serviceId.toString()] = service.price;
         return acc;
       },
       {} as Record<string, number>,
@@ -29,22 +40,25 @@ const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues,
+    resolver: zodResolver(priceListSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   });
 
   const onSubmit = async (data: FormValues) => {
     const newEntries = currentPriceListTestData.entries.map((service) => ({
       serviceId: service.serviceId,
-      price: Number(data.entries[service.serviceId]),
+      price: Number(data.entries[service.serviceId.toString()]),
     }));
     const newPriceListDto: NewPriceListDto = { entries: newEntries };
     console.log(newPriceListDto);
 
     try {
-      // TODO: implement
+      // TODO: implement API call to update price list.
       toast.success('Прайс лист успішно оновлено');
     } catch (error) {
       toast.error('Помилка мережі');
-      console.log(error);
+      console.error(error);
     }
     reset();
     onClose();
@@ -88,7 +102,7 @@ const PriceListForm: React.FC<PriceListFormProps> = ({ isOpen, onClose }) => {
                 errors.entries &&
                 errors.entries[service.serviceId.toString()]?.message
               }
-              register={register(`entries.${service.serviceId}`, {
+              register={register(`entries.${service.serviceId.toString()}`, {
                 valueAsNumber: true,
               })}
               css={{ marginBottom: '1rem' }}
