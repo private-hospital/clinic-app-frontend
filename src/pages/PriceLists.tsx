@@ -104,6 +104,18 @@ const PriceLists = () => {
     toast.success('Послугу було успішно архівовано');
   };
 
+  const handleMakePLActive = (id: number): void => {
+    console.log(id);
+    toast.success('Прайс лист був успішно активований');
+    toggleDropdown(id);
+  };
+
+  const handleArchivePL = (id: number): void => {
+    console.log(id);
+    toast.success('Прайс лист був успішно архівований');
+    toggleDropdown(id);
+  };
+
   const formatDate = (ts: number): string => {
     const date = new Date(ts);
     const day = String(date.getDate()).padStart(2, '0');
@@ -212,10 +224,16 @@ const PriceLists = () => {
                           className="pl-dropdown-menu"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <button type="button" onClick={() => {}}>
+                          <button
+                            type="button"
+                            onClick={() => handleMakePLActive(p.id)}
+                          >
                             Зробити активним
                           </button>
-                          <button type="button" onClick={() => {}}>
+                          <button
+                            type="button"
+                            onClick={() => handleArchivePL(p.id)}
+                          >
                             Архівувати
                           </button>
                         </div>
