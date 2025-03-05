@@ -13,6 +13,8 @@ import '../styles/PatientRegistrationForm.css';
 import { toast } from 'react-toastify';
 import Button from './Button';
 import Select from './Select';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 type StepOneData = ReturnType<typeof stepOneSchema.parse>;
 type StepTwoData = ReturnType<typeof stepTwoSchema.parse>;
@@ -86,7 +88,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
   };
 
   const onSubmitStep2 = (data: StepTwoData) => {
-    setPatientData((prev) => ({ ...prev, ...data }));
+    console.log(data);
     setIsCodeBlocked(true);
     setStep(3);
   };
@@ -95,23 +97,13 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
     const finalData = { ...patientData, ...data } as PatientData;
     console.log(finalData);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/public/patients`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(finalData),
-        },
+      await api.post<StatusResponseDto, PatientData>(
+        '/public/patients',
+        finalData,
       );
 
-      if (response.ok) {
-        toast.success('Пацієнт був успішно доданий');
-        decOnClose();
-      } else {
-        throw new Error('Помилка при додаванні пацієнта');
-      }
+      toast.success('Пацієнт був успішно доданий');
+      decOnClose();
     } catch (error) {
       toast.error('Не вдалося додати пацієнта');
       console.error('Error:', error);
