@@ -1,79 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
+import api from '../service/axiosUtils';
 import Button from './Button';
 import Select from './Select';
 import Input from './Input';
-
-import {
-  StepOneForm,
-  stepOneSchema,
-  AppointmentRow,
-} from '../types/appointments';
+import { StepOneForm, stepOneSchema } from '../types/appointments';
 import '../styles/NewAppointmentForm.css';
+import { RouteParams, StatusResponseDto } from '../types/common';
+import { AvailableServicesDto } from './FilterModal';
+import { SelectOption } from '../types/selectComponent';
+import { useParams } from 'react-router';
 
-function getAllServices(): { label: string; value: string }[] {
-  // TODO: replace with actual API call
-  return [
-    { label: 'Оберіть послугу', value: '' },
-    { label: 'УЗД', value: 'УЗД' },
-    { label: 'Консультація невролога', value: 'Консультація невролога' },
-    { label: 'МРТ', value: 'МРТ' },
-  ];
+interface AvailableDoctor {
+  id: number;
+  displayName: string;
 }
 
-async function fetchDoctorsByService(
-  service: string,
-): Promise<{ label: string; value: string }[]> {
-  // TODO: replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (service === 'УЗД') {
-        resolve([
-          { label: 'Оберіть лікаря', value: '' },
-          { label: 'Мельник Ольга Ігоровна', value: 'Мельник Ольга Ігоровна' },
-          { label: 'Іваненко Олег Петрович', value: 'Іваненко Олег Петрович' },
-        ]);
-      } else if (service === 'Консультація невролога') {
-        resolve([
-          { label: 'Оберіть лікаря', value: '' },
-          {
-            label: 'Сидоренко Марія Василівна',
-            value: 'Сидоренко Марія Василівна',
-          },
-          { label: 'Іваненко Олег Петрович', value: 'Іваненко Олег Петрович' },
-        ]);
-      } else {
-        resolve([
-          { label: 'Оберіть лікаря', value: '' },
-          {
-            label: 'Сидоренко Марія Василівна',
-            value: 'Сидоренко Марія Василівна',
-          },
-          { label: 'Мельник Ольга Ігоровна', value: 'Мельник Ольга Ігоровна' },
-        ]);
-      }
-    }, 100);
-  });
-}
-
-async function fetchTimesByDoctorAndDate(
-  doctor: string,
-  date: string,
-): Promise<{ label: string; value: string }[]> {
-  console.log(doctor, date);
-  // TODO: replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { label: 'Оберіть час', value: '' },
-        { label: '09:00 - 09:30', value: '09:00' },
-        { label: '09:30 - 10:00', value: '09:30' },
-        { label: '10:00 - 10:30', value: '10:00' },
-      ]);
-    }, 500);
-  });
+interface AvailableTimes {
+  entries: string[];
 }
 
 interface RowState {
@@ -89,11 +35,61 @@ interface NewAppointmentFormProps {
   onClose: () => void;
 }
 
+export interface PriceResponseDto {
+  service: string;
+  price: number;
+}
+
+export interface PatientDiscountDto {
+  patientId: string;
+  discountPercent: number;
+}
+
 const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
   isOpen,
   onClose,
 }) => {
   const [step, setStep] = useState(1);
+  const [serviceOptions, setServiceOptions] = useState<SelectOption[]>([]);
+  const [discount, setDiscount] = useState<number>(0);
+  const { id } = useParams<RouteParams>();
+
+  const fetchServiceNames = async () => {
+    try {
+      const response = await api.get<AvailableServicesDto>(
+        '/public/services/names',
+      );
+      const services = response.services.map((s: string): SelectOption => {
+        return {
+          value: s,
+          label: s,
+        };
+      });
+      services.unshift({ value: '', label: '' });
+      setServiceOptions(services);
+    } catch (error) {
+      console.error('Error fetching service names:', error);
+      toast.error('Не вдалось завантажити доступні послуги');
+      setServiceOptions([]);
+    }
+  };
+
+  const getPatientDiscount = async (): Promise<void> => {
+    try {
+      const response = await api.get<PatientDiscountDto>(
+        `/registrar/get-patient-discount?patientId=${id}`,
+      );
+      setDiscount(response.discountPercent);
+    } catch (error) {
+      console.error('Error fetching patient discount:', error);
+      toast.error('Не вдалось отримати інформацію про знижку пацієнта');
+    }
+  };
+
+  useEffect(() => {
+    getPatientDiscount();
+    fetchServiceNames();
+  }, []);
 
   const {
     register,
@@ -106,7 +102,9 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
-      appointments: [{ service: '', doctorName: '', date: '', time: '' }],
+      appointments: [
+        { service: '', doctorId: '', doctorName: '', date: '', time: '' },
+      ],
     },
   });
 
@@ -126,7 +124,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
   );
 
   const handleAddRow = () => {
-    append({ service: '', doctorName: '', date: '', time: '' });
+    append({ service: '', doctorId: '', doctorName: '', date: '', time: '' });
     setRowsState((prev) => [
       ...prev,
       {
@@ -150,16 +148,47 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
 
   const [stepOneData, setStepOneData] = useState<StepOneForm | null>(null);
 
-  const onSubmitStep1 = (data: StepOneForm) => {
+  const onSubmitStep1 = async (data: StepOneForm) => {
     setStepOneData(data);
     setStep(2);
   };
 
-  const onSubmitStep2 = () => {
-    console.log(stepOneData);
-    toast.success('Записи успішно створено');
-    handleClose();
+  const onSubmitStep2 = async () => {
+    try {
+      await api.post<StatusResponseDto, StepOneForm>(
+        `/api/appointments/create-appointments`,
+        stepOneData!,
+      );
+      toast.success('Записи успішно створено');
+      handleClose();
+    } catch (error) {
+      toast.error('Не вдалося створити записи');
+      console.error(error);
+    }
   };
+
+  const [subtotal, setSubtotal] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const getSubtotal = async (): Promise<void> => {
+    let res = 0;
+    for (const el of stepOneData?.appointments ?? []) {
+      res += (await getPriceForAppointment(el.service)) ?? 0;
+    }
+    setSubtotal(res);
+  };
+
+  const getTotal = () => {
+    setTotal((subtotal * discount) / 100);
+  };
+
+  useEffect(() => {
+    getSubtotal();
+  }, [stepOneData]);
+
+  useEffect(() => {
+    getTotal();
+  }, [subtotal]);
 
   const handleBack = () => {
     setStep(1);
@@ -180,88 +209,116 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     );
   };
 
-  const getPriceForAppointment = (row: AppointmentRow) => {
-    console.log(row);
-    return 1000;
-  };
-
-  const totalWithoutDiscount = stepOneData?.appointments.reduce(
-    (acc, row) => acc + getPriceForAppointment(row),
-    0,
-  );
-  const discount = 0.4;
-  const totalWithDiscount =
-    totalWithoutDiscount && totalWithoutDiscount * (1 - discount);
-
-  if (!isOpen) return null;
-
   const handleServiceChange = async (index: number, serviceValue: string) => {
     update(index, {
       service: serviceValue,
+      doctorId: '',
       doctorName: '',
       date: '',
       time: '',
     });
 
-    const doctors = await fetchDoctorsByService(serviceValue);
+    try {
+      const response = await api.get<{ entries: AvailableDoctor[] }>(
+        `/registrar/available-doctors?service=${serviceValue}`,
+      );
+      const doctors = response.entries.map((doc) => ({
+        label: doc.displayName,
+        value: doc.id.toString(),
+      }));
+      doctors.unshift({ value: '', label: '' });
 
-    setRowsState((prev) => {
-      const newArr = [...prev];
-      newArr[index] = {
-        doctors,
-        times: [],
-        isDoctorDisabled: false,
-        isDateDisabled: true,
-        isTimeDisabled: true,
-      };
-      return newArr;
-    });
+      setRowsState((prev) => {
+        const newArr = [...prev];
+        newArr[index] = {
+          doctors,
+          times: [],
+          isDoctorDisabled: false,
+          isDateDisabled: true,
+          isTimeDisabled: true,
+        };
+        return newArr;
+      });
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      toast.error('Не вдалося отримати список лікарів');
+    }
   };
 
-  const handleDoctorChange = (index: number, doctorValue: string) => {
+  const handleDoctorChange = (index: number, doctorId: string) => {
+    const selectedDoctor = rowsState[index].doctors.find(
+      (doc) => doc.value === doctorId,
+    );
+
     update(index, {
       ...fields[index],
-      doctorName: doctorValue,
+      doctorId: doctorId,
+      doctorName: selectedDoctor ? selectedDoctor.label : '',
       date: '',
       time: '',
     });
 
     setRowsState((prev) => {
       const newArr = [...prev];
-      const row = newArr[index];
       newArr[index] = {
-        ...row,
+        ...newArr[index],
         isDateDisabled: false,
-        times: [],
         isTimeDisabled: true,
+        times: [],
       };
       return newArr;
     });
   };
 
   const handleDateChange = async (index: number, dateValue: string) => {
-    const doctorName = (fields[index] as AppointmentRow).doctorName;
+    const doctorId = fields[index].doctorId;
     update(index, { ...fields[index], date: dateValue, time: '' });
 
-    const times = await fetchTimesByDoctorAndDate(doctorName, dateValue);
+    if (!doctorId) return;
 
-    setRowsState((prev) => {
-      const newArr = [...prev];
-      const row = newArr[index];
-      newArr[index] = {
-        ...row,
-        times,
-        isTimeDisabled: false,
-      };
-      return newArr;
-    });
+    try {
+      const response = await api.get<AvailableTimes>(
+        `/registrar/available-times?doctorId=${doctorId}&date=${dateValue}`,
+      );
+
+      setRowsState((prev) => {
+        const newArr = [...prev];
+        newArr[index] = {
+          ...newArr[index],
+          times: response.entries.map((time) => ({
+            label: time,
+            value: time,
+          })),
+          isTimeDisabled: false,
+        };
+        return newArr;
+      });
+    } catch (error) {
+      console.error('Error fetching available times:', error);
+      toast.error('Не вдалося отримати доступні години');
+    }
   };
 
   const handleTimeChange = (index: number, timeValue: string) => {
     update(index, { ...fields[index], time: timeValue });
   };
 
-  const serviceOptions = getAllServices();
+  async function getPriceForAppointment(
+    serviceName: string,
+  ): Promise<number | null> {
+    try {
+      const response = await api.get<PriceResponseDto>(
+        `/registrar/get-price-for-service?service=${encodeURIComponent(serviceName)}`,
+      );
+
+      return response.price;
+    } catch (error) {
+      console.error('Error fetching service price:', error);
+      return null;
+    }
+  }
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
@@ -303,7 +360,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                           register={register(
                             `appointments.${index}.service` as const,
                           )}
-                          options={serviceOptions}
+                          options={serviceOptions ?? []}
                           onChange={(e) =>
                             handleServiceChange(index, e.target.value)
                           }
@@ -315,14 +372,14 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                       <td>
                         <Select
                           label=""
-                          selectId={`appointments.${index}.doctorName`}
+                          selectId={`appointments.${index}.doctorId`}
                           error={
-                            errors.appointments?.[index]?.doctorName?.message ||
+                            errors.appointments?.[index]?.doctorId?.message ||
                             undefined
                           }
                           disableErr={true}
                           register={register(
-                            `appointments.${index}.doctorName` as const,
+                            `appointments.${index}.doctorId` as const,
                           )}
                           options={rowState.doctors}
                           onChange={(e) =>
@@ -340,7 +397,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                           placeholder=""
                           inputId={`appointments.${index}.date`}
                           error={errors.appointments?.[index]?.date?.message}
-                          disableErr={true}
+                          disableErr={rowState.isDateDisabled}
                           register={register(
                             `appointments.${index}.date` as const,
                           )}
@@ -364,10 +421,10 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                           register={register(
                             `appointments.${index}.time` as const,
                           )}
-                          options={rowState.times}
                           onChange={(e) =>
                             handleTimeChange(index, e.target.value)
                           }
+                          options={rowState.times}
                           disabled={rowState.isTimeDisabled}
                           css={{ fontSize: '1rem' }}
                         />
@@ -443,7 +500,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
               </thead>
               <tbody>
                 {stepOneData.appointments.map((appt, idx) => {
-                  const price = getPriceForAppointment(appt);
+                  const price = getPriceForAppointment(appt.service);
                   return (
                     <tr key={idx}>
                       <td>{appt.service}</td>
@@ -460,7 +517,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                   <td></td>
                   <td style={{ textAlign: 'right' }}>Сума (без знижки)</td>
                   <td style={{ textAlign: 'left' }}>
-                    {totalWithoutDiscount || 0} грн
+                    {subtotal.toFixed(2)} грн
                   </td>
                 </tr>
                 <tr>
@@ -478,7 +535,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                     Сума (зі знижкою):
                   </td>
                   <td style={{ textAlign: 'left', fontWeight: 600 }}>
-                    {totalWithDiscount?.toFixed(2) || 0} грн
+                    {total.toFixed(2) || 0} грн
                   </td>
                 </tr>
               </tbody>
