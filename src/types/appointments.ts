@@ -1,8 +1,16 @@
 export enum AppointmentStatuses {
-  COMPLETED = 'Завершений',
-  CANCELED = 'Скасований',
-  PLANNED = 'Запланований',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
+  PLANNED = 'PLANNED',
 }
+
+export const appStatusToReadable = (s: AppointmentStatuses) => {
+  return s === AppointmentStatuses.COMPLETED
+    ? 'Завершений'
+    : s === AppointmentStatuses.CANCELED
+      ? 'Скасований'
+      : 'Запланований';
+};
 
 export interface AppointmentsRegistryEntryDto {
   id: number;
