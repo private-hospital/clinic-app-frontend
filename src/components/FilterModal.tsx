@@ -8,7 +8,7 @@ import '../styles/FilterModal.css';
 import Button from './Button';
 import api from '../service/axiosUtils';
 
-interface AvailableServicesDto {
+export interface AvailableServicesDto {
   services: string[];
 }
 

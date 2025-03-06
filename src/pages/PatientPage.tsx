@@ -24,12 +24,13 @@ import {
   appStatusToReadable,
 } from '../types/appointments';
 import {
+  MedicalCardDto,
   MedicalCardRecordDto,
-  medicalCardRecordsTestData,
   MedicalCardRecordTypes,
 } from '../types/cardRecords';
 import NewAppointmentForm from '../components/NewAppointmentForm';
 import MedicalRecordForm from '../components/MedicalRecordForm';
+import api from '../service/axiosUtils';
 
 const PatientPage = () => {
   const [isAppointmentFormOpened, setIsAppointmentFormOpened] = useState(false);
@@ -39,6 +40,7 @@ const PatientPage = () => {
   const { id: ids } = useParams<RouteParams>();
   const id = Number(ids);
   const [p, setP] = useState<PatientsRegistryEntryDto | undefined>(undefined);
+  const [medicalCard, setMedicalCard] = useState<MedicalCardDto | null>(null);
 
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
@@ -58,12 +60,30 @@ const PatientPage = () => {
       setP(patientData);
     } catch (error) {
       console.error(error);
+      toast.error('Не вдалось завантажити дані пацієнта');
+    }
+  };
+
+  const fetchMedicalRecords = async () => {
+    try {
+      const response = await api.get<MedicalCardDto>(
+        `/doctor/records?patientId=${id}`,
+      );
+      console.log(response);
+      setMedicalCard(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити медичні записи');
     }
   };
 
   useEffect(() => {
     fetchPatient();
   }, [id]);
+
+  useEffect(() => {
+    fetchMedicalRecords();
+  }, [id, isMRFOpened]);
 
   const {
     register,
@@ -404,7 +424,7 @@ const PatientPage = () => {
           )}
         </div>
         <div className="medical-records-list">
-          {medicalCardRecordsTestData.map((record, idx) => (
+          {medicalCard?.entries?.map((record, idx) => (
             <div className="medical-record-card" key={idx}>
               <div className="mr-top-row">
                 <h4 className="mr-title">{record.title}</h4>
