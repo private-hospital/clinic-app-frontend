@@ -27,6 +27,9 @@ export const patientEditSchema = z.object({
   sex: z.enum(['MALE', 'FEMALE'], {
     required_error: 'Будь ласка, оберіть стать',
   }),
+  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
+    required_error: 'Будь ласка, оберіть пільгову групу',
+  }),
 });
 
 export type PatientEditFormData = z.infer<typeof patientEditSchema>;
@@ -40,6 +43,9 @@ export const stepOneSchema = z.object({
   dob: z.string().nonempty('Введіть дату народження'),
   sex: z.enum(['MALE', 'FEMALE'], {
     errorMap: () => ({ message: 'Оберіть стать' }),
+  }),
+  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
+    errorMap: () => ({ message: 'Оберіть пільгову групу' }),
   }),
 });
 

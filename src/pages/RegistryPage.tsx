@@ -93,7 +93,7 @@ const RegistryPage = () => {
               <th>Електронна пошта</th>
               <th>Дата народження</th>
               <th>Стать</th>
-              <th>Пільга</th>
+              <th>Пільгова група</th>
             </tr>
           </thead>
           <tbody>
