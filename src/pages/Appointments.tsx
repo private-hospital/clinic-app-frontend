@@ -11,15 +11,18 @@ import Select from '../components/Select';
 import {
   AppointmentsRegistryDto,
   AppointmentStatuses,
-  appointmentsTestData,
 } from '../types/appointments';
 import Button from '../components/Button';
 import { toast } from 'react-toastify';
+import api from '../service/axiosUtils';
 
 const Appointments = () => {
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState(AppointmentStatuses.PLANNED);
+  const [status, setStatus] = useState<AppointmentStatuses>(
+    AppointmentStatuses.PLANNED,
+  );
   const [data, setData] = useState<AppointmentsRegistryDto | null>(null);
+
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
 
@@ -32,25 +35,37 @@ const Appointments = () => {
   }, [status]);
 
   useEffect(() => {
-    const perPage = 4;
-    const filteredEntries = appointmentsTestData.filter(
-      (a) => a.status === status,
-    );
-    const totalPages = Math.ceil(filteredEntries.length / perPage);
-    const startIndex = (page - 1) * perPage;
-    const pageEntries = filteredEntries.slice(startIndex, startIndex + perPage);
+    fetchAppointments();
+  }, [page, status]);
 
-    console.log(filteredEntries);
+  const fetchAppointments = async () => {
+    try {
+      const response = await api.get<AppointmentsRegistryDto>(
+        `/doctor/appointments?p=${page}&q=10&status=${status}`,
+      );
+      setData(response);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      toast.error('Не вдалось завантажити список записів');
+    }
+  };
 
-    setData({
-      totalPages,
-      perPage,
-      page,
-      entries: pageEntries,
-    });
-  }, [status, page]);
+  const completeAppointment = async (appointmentId: number) => {
+    try {
+      await api.post<unknown, null>(
+        `/doctor/appointments?id=${appointmentId}`,
+        null,
+      );
+      toast.success('Огляд / процедуру завершено');
+      fetchAppointments();
+    } catch (error) {
+      console.error('Error completing appointment:', error);
+      toast.error('Не вдалось завершити послугу');
+    }
+  };
 
   const formatDate = (ts: number): string => {
+    if (!ts) return '-';
     const date = new Date(ts);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -102,23 +117,27 @@ const Appointments = () => {
           <tbody>
             {data &&
               data.entries.map((p) => {
+                const fullDateTime = formatDate(p.appointmentDate);
+                const datePart = fullDateTime.substring(0, 10);
+                const timePart = fullDateTime.substring(11);
+
                 return (
-                  <tr>
+                  <tr key={p.id}>
                     <td>{p.patientName}</td>
                     <td>{p.service}</td>
-                    <td>{formatDate(p.appointmentDate).substring(0, 10)}</td>
-                    <td>{formatDate(p.appointmentDate).substring(10)}</td>
+                    <td>{datePart}</td>
+                    <td>{timePart}</td>
                     <td>
                       {status === AppointmentStatuses.PLANNED && (
                         <Button
                           type={
-                            new Date() > new Date(p.appointmentDate)
+                            new Date().getTime() > p.appointmentDate
                               ? 'primary'
                               : 'secondary'
                           }
                           text="Завершити огляд / процедуру"
                           isSubmit={false}
-                          disabled={new Date() < new Date(p.appointmentDate)}
+                          disabled={new Date().getTime() < p.appointmentDate}
                           css={{
                             width: 'fit-content',
                             fontSize: '1rem',
@@ -127,9 +146,7 @@ const Appointments = () => {
                             paddingRight: '2rem',
                             fontWeight: 300,
                           }}
-                          onClick={() =>
-                            toast.success('Надання послуги успішно завершено')
-                          }
+                          onClick={() => completeAppointment(p.id)}
                         />
                       )}
                     </td>
