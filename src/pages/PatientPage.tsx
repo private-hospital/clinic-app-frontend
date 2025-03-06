@@ -18,7 +18,11 @@ import { toast } from 'react-toastify';
 import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
-import { appointmentsTestData } from '../types/appointments';
+import {
+  AppointmentStatuses,
+  appointmentsTestData,
+  appStatusToReadable,
+} from '../types/appointments';
 import {
   MedicalCardRecordDto,
   medicalCardRecordsTestData,
@@ -302,13 +306,13 @@ const PatientPage = () => {
                         label="Статус прийому"
                         placeholder=""
                         inputId={`status-${index}`}
-                        value={a.status}
+                        value={appStatusToReadable(a.status)}
                         disabled={true}
                         css={{
                           color:
-                            a.status === 'Завершений'
+                            a.status === AppointmentStatuses.PLANNED
                               ? '#00b11d'
-                              : a.status === 'Запланований'
+                              : a.status === AppointmentStatuses.COMPLETED
                                 ? '#4699e6'
                                 : '#c70000',
                           fontWeight: 200,
@@ -316,7 +320,7 @@ const PatientPage = () => {
                         }}
                         cancelId={
                           authCtx.tokenPayload?.role === 'REGISTRAR' &&
-                          a.status === 'Запланований'
+                          a.status === AppointmentStatuses.PLANNED
                             ? a.id
                             : undefined
                         }

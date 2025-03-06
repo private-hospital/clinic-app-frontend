@@ -38,6 +38,7 @@ export interface CurrentPriceListEntryDto {
 }
 
 export interface NewPriceListDto {
+  name: string;
   entries: NewPriceListEntryDto[];
 }
 

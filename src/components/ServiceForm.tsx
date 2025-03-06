@@ -10,6 +10,8 @@ import {
   newServiceSchema,
   ServiceFormProps,
 } from '../types/services';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const {
@@ -26,7 +28,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const onSubmit = async (data: NewServiceDto) => {
     console.log('New Service DTO:', data);
     try {
-      // TODO: Implement API call to send new service data to the server.
+      await api.post<StatusResponseDto, NewServiceDto>('/owner/services', data);
       toast.success('Послугу успішно додано');
     } catch (error) {
       toast.error('Сталася помилка при додаванні послуги');

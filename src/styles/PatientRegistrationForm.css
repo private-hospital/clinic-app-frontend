@@ -13,11 +13,8 @@
 }
 
 .modal-content {
-    position: relative;
     background: #fff;
-    width: 30vw;
-    min-width: 600px;
-    max-width: 90%;
+    min-width: fit-content;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);

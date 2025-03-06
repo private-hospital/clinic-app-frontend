@@ -58,7 +58,7 @@ const ArchivePriceListForm: React.FC<ArchivePriceListFormProps> = ({
         <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
           Архівування прайс-листа
         </h2>
-        <p style={{ marginBottom: '1rem', textAlign: 'left' }}>
+        <p style={{ marginBottom: '2rem', textAlign: 'center' }}>
           Після архівування прайс-листа, його буде неможливо відновити. Якщо ви
           впевнені у своїх намірах, то надайте причину в полі нижче та натисніть
           “Архівувати”.
