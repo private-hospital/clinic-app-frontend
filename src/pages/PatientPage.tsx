@@ -19,8 +19,8 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
 import {
+  AppointmentsRegistryDto,
   AppointmentStatuses,
-  appointmentsTestData,
   appStatusToReadable,
 } from '../types/appointments';
 import {
@@ -41,6 +41,8 @@ const PatientPage = () => {
   const id = Number(ids);
   const [p, setP] = useState<PatientsRegistryEntryDto | undefined>(undefined);
   const [medicalCard, setMedicalCard] = useState<MedicalCardDto | null>(null);
+  const [appointmentsRegistry, setAppointmentsRegistry] =
+    useState<AppointmentsRegistryDto | null>(null);
 
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
@@ -77,8 +79,22 @@ const PatientPage = () => {
     }
   };
 
+  const fetchAppointments = async () => {
+    try {
+      const response = await api.get<AppointmentsRegistryDto>(
+        `/registrar/patient-appointments?id=${id}`,
+      );
+      console.log(response);
+      setAppointmentsRegistry(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити записи на прийом');
+    }
+  };
+
   useEffect(() => {
     fetchPatient();
+    fetchAppointments();
   }, [id]);
 
   useEffect(() => {
@@ -292,8 +308,8 @@ const PatientPage = () => {
               <h3>Візити до лікаря</h3>
 
               <div className="visits-list">
-                {appointmentsTestData?.length ? (
-                  appointmentsTestData.map((a, index) => (
+                {appointmentsRegistry ? (
+                  appointmentsRegistry.entries.map((a, index) => (
                     <div className="visit-card" key={index}>
                       <Input
                         type="text"
@@ -344,6 +360,7 @@ const PatientPage = () => {
                             ? a.id
                             : undefined
                         }
+                        onCancel={fetchAppointments}
                       />
                       <Input
                         type="text"
@@ -446,9 +463,9 @@ const PatientPage = () => {
                     ? record.analysisResults.map((res, i) => (
                         <li key={i}>
                           <a
-                            href={
-                              import.meta.env.VITE_CDN_BASE_URL + '/sample.pdf'
-                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={res}
                             style={{ textDecoration: 'underline' }}
                           >
                             {res}
