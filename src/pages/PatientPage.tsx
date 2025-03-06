@@ -84,7 +84,12 @@ const PatientPage = () => {
         ? new Date(p.dob).toISOString().slice(0, 10)
         : new Date(2000, 0, 1).toISOString().slice(0, 10),
       sex: p?.sex === 'FEMALE' ? 'FEMALE' : 'MALE',
-      benefit: p?.benefit as ('military' | 'elderly' | 'disabled' | 'staff_family' | undefined)
+      benefit: p?.benefit as
+        | 'military'
+        | 'elderly'
+        | 'disabled'
+        | 'staff_family'
+        | undefined,
     },
   });
 
@@ -100,7 +105,12 @@ const PatientPage = () => {
           ? new Date(p.dob).toISOString().slice(0, 10)
           : new Date(2000, 0, 1).toISOString().slice(0, 10),
         sex: p?.sex === 'FEMALE' ? 'FEMALE' : 'MALE',
-        benefit: p?.benefit as ('military' | 'elderly' | 'disabled' | 'staff_family' | undefined)
+        benefit: p?.benefit as
+          | 'military'
+          | 'elderly'
+          | 'disabled'
+          | 'staff_family'
+          | undefined,
       });
     }
   }, [p, reset]);
@@ -118,11 +128,11 @@ const PatientPage = () => {
           body: JSON.stringify(data),
         },
       );
-  
+
       if (!response.ok) {
         throw new Error('Не вдалося оновити дані пацієнта');
       }
-  
+
       toast.success('Пацієнта збережено');
       // Опційно: можна викликати fetchPatient(), щоб одразу підвантажити оновлені дані
       // fetchPatient();
@@ -131,7 +141,6 @@ const PatientPage = () => {
       toast.error('Сталася помилка при збереженні даних');
     }
   };
-  
 
   const formatDate = (timestamp: number): string => {
     const dateObj = new Date(timestamp);
@@ -271,20 +280,35 @@ const PatientPage = () => {
                   css={errors.sex?.message ? {} : { backgroundColor: 'white' }}
                 />
 
-                <Select
-                  label="Пільгова група"
-                  selectId="benefit"
-                  error={errors.benefit?.message}
-                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
-                  register={register('benefit')}
-                  options={[
-                    { label: 'Військові (знижка 20%)', value: 'military' },
-                    { label: 'Люди похилого віку (знижка 10%)', value: 'elderly' },
-                    { label: 'Люди з інвалідністю (знижка 5%)', value: 'disabled' },
-                    { label: 'Члени родин працівників (знижка 40%)', value: 'staff_family' },
-                  ]}
-                  css={errors.benefit?.message ? {} : { backgroundColor: 'white' }}
-                />
+                <div className="benefit-group-style">
+                  <Select
+                    label="Пільгова група"
+                    selectId="benefit"
+                    error={errors.benefit?.message}
+                    disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
+                    register={register('benefit')}
+                    options={[
+                      { label: 'Військові (знижка 20%)', value: 'military' },
+                      {
+                        label: 'Люди похилого віку (знижка 10%)',
+                        value: 'elderly',
+                      },
+                      {
+                        label: 'Люди з інвалідністю (знижка 5%)',
+                        value: 'disabled',
+                      },
+                      {
+                        label: 'Члени родин працівників (знижка 40%)',
+                        value: 'staff_family',
+                      },
+                    ]}
+                    css={
+                      errors.benefit?.message
+                        ? {}
+                        : { backgroundColor: 'white' }
+                    }
+                  />
+                </div>
 
                 {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
                   <Button
