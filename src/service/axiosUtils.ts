@@ -17,6 +17,12 @@ class ApiClient {
     });
   }
 
+  async getBlob(url: string, config?: AxiosRequestConfig): Promise<Blob> {
+    const finalConfig = { ...config, responseType: 'blob' as const };
+    const response = await this.axiosInstance.get(url, finalConfig);
+    return response.data;
+  }
+
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.axiosInstance
       .get<AbstractResponseDto<T>>(url, config)
