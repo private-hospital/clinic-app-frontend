@@ -312,7 +312,7 @@ export default function NewAppointmentForm({
       if (stepOneData == null) throw new Error('null stepOneForm data');
 
       const response = await api.postToGetBlob(
-        '/registrar/export-invoice',
+        `/registrar/export-invoice?patientId=${id}`,
         stepOneData,
       );
 
