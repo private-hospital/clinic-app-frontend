@@ -125,7 +125,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content" style={{ minWidth: '600px' }}>
         <button className="modal-close" onClick={decOnClose}>
           &times;
         </button>
