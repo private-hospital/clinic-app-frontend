@@ -14,7 +14,9 @@ import api from '../service/axiosUtils';
 const RegistryPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [data, setData] = useState<PatientsRegistryDto | null>(null);
-  const [filteredData, setFilteredData] = useState<PatientsRegistryDto['entries']>([]);
+  const [filteredData, setFilteredData] = useState<
+    PatientsRegistryDto['entries']
+  >([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -31,9 +33,12 @@ const RegistryPage = () => {
     if (!data) return;
 
     const filtered = data.entries.filter((p) =>
-      Object.values(p).some((value) =>
-        value && typeof value === 'string' && value.toLowerCase().includes(query)
-      )
+      Object.values(p).some(
+        (value) =>
+          value &&
+          typeof value === 'string' &&
+          value.toLowerCase().includes(query),
+      ),
     );
 
     setFilteredData(filtered);
@@ -42,7 +47,7 @@ const RegistryPage = () => {
   const fetchData = async () => {
     try {
       const response = await api.get<PatientsRegistryDto>(
-        `/public/registry?p=${page}&q=10`
+        `/public/registry?p=${page}&q=10`,
       );
       setData(response);
       setFilteredData(response.entries); // Ініціалізуємо відфільтровані дані
@@ -58,15 +63,21 @@ const RegistryPage = () => {
   return (
     <div className="auth-body">
       <Header />
-      <PatientRegistrationForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
-      
+      <PatientRegistrationForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+      />
+
       <div className="registry-holder">
         <div className="controls-block">
           <h1 className="page-title">Реєстр пацієнтів</h1>
           <div className="buttons-holder">
             <div className="search-box">
               <img
-                src={import.meta.env.VITE_CDN_BASE_URL + '/svg/magnifying-glass.svg'}
+                src={
+                  import.meta.env.VITE_CDN_BASE_URL +
+                  '/svg/magnifying-glass.svg'
+                }
                 alt="Search"
               />
               <input
@@ -79,7 +90,13 @@ const RegistryPage = () => {
             </div>
             {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
               <button className="add-btn" onClick={() => setIsFormOpen(true)}>
-                <span style={{ fontSize: '1.5rem', marginRight: '0.8rem', fontWeight: 200 }}>
+                <span
+                  style={{
+                    fontSize: '1.5rem',
+                    marginRight: '0.8rem',
+                    fontWeight: 200,
+                  }}
+                >
                   +
                 </span>{' '}
                 Додати пацієнта
@@ -114,12 +131,18 @@ const RegistryPage = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center' }}>Немає записів</td>
+                <td colSpan={7} style={{ textAlign: 'center' }}>
+                  Немає записів
+                </td>
               </tr>
             )}
           </tbody>
         </table>
-        <Pagination setPage={setPage} page={page} totalPages={data ? data.totalPages : 1} />
+        <Pagination
+          setPage={setPage}
+          page={page}
+          totalPages={data ? data.totalPages : 1}
+        />
       </div>
     </div>
   );
