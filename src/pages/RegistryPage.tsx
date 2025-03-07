@@ -21,7 +21,6 @@ const RegistryPage = () => {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
-
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
   }, [navigate, authCtx]);
@@ -138,6 +137,11 @@ const RegistryPage = () => {
             )}
           </tbody>
         </table>
+        {(!data || data.entries.length === 0) && (
+          <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+            Немає записів
+          </p>
+        )}
         <Pagination
           setPage={setPage}
           page={page}
