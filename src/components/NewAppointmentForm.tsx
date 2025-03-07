@@ -95,7 +95,7 @@ export default function NewAppointmentForm({
       api
         .get<AvailableServicesDto>('/public/services/names')
         .then((resp) => {
-          const services = resp.services.map((s) => ({
+          const services = resp.services.map((s: string) => ({
             value: s,
             label: s,
           }));
@@ -395,7 +395,7 @@ export default function NewAppointmentForm({
                             handleDoctorChange(index, e.target.value)
                           }
                           disabled={rowState.isDoctorDisabled}
-                          css={{ fontSize: '1rem' }}
+                          css={{ fontSize: '1rem', maxWidth: '300px' }}
                         />
                       </td>
 
