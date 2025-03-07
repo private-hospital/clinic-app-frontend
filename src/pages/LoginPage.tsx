@@ -104,6 +104,7 @@ const LoginPage = () => {
             inputId="email"
             error={errors.email?.message}
             register={register('email')}
+            css={{ marginBottom: '1rem' }}
           />
           <Input
             type="password"
@@ -116,7 +117,7 @@ const LoginPage = () => {
           <Button
             type="primary"
             text="Вхід"
-            css={{ width: '100%' }}
+            css={{ width: '100%', marginTop: '1rem' }}
             isSubmit={true}
           />
         </form>

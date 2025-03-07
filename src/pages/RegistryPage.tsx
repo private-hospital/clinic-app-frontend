@@ -38,6 +38,20 @@ const RegistryPage = () => {
     }
   };
 
+  const fromSex = (sex: string): string => {
+    if (sex === 'MALE') return 'Чоловік';
+    return 'Жінка';
+  };
+
+  const fromBenefit = (benefit: string): string => {
+    if (benefit === 'military') return 'Військові (знижка 20%)';
+    if (benefit === 'elderly') return 'Люди похилого віку (знижка 10%)';
+    if (benefit === 'disabled') return 'Люди з інвалідністю (знижка 5%)';
+    if (benefit === 'staff_family')
+      return 'Члени родин працівників (знижка 40%)';
+    return '-';
+  };
+
   useEffect(() => {
     fetchData();
   }, [page, isFormOpen]);
@@ -106,8 +120,8 @@ const RegistryPage = () => {
                     <td>{p.phone}</td>
                     <td>{p.email}</td>
                     <td>{p.dob}</td>
-                    <td>{p.sex}</td>
-                    <td>{p.benefit}</td>
+                    <td>{fromSex(p.sex)}</td>
+                    <td>{fromBenefit(p.benefit)}</td>
                   </tr>
                 );
               })}
