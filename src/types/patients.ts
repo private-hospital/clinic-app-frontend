@@ -21,7 +21,10 @@ export const patientEditSchema = z.object({
   lastName: z.string().min(1, 'Прізвище є обов’язковим'),
   firstName: z.string().min(1, 'Ім’я є обов’язковим'),
   middleName: z.string().optional(),
-  phone: z.string().min(1, 'Номер телефону є обов’язковим'),
+  phone: z
+    .string()
+    .min(1, 'Номер телефону є обов’язковим')
+    .regex(/^\+380\d{9}$/, 'Некоректний формат номера телефону'),
   email: z.string().email('Некоректна електронна пошта'),
   dob: z.string().min(1, 'Дата народження є обов’язковою'),
   sex: z.enum(['MALE', 'FEMALE'], {
@@ -36,7 +39,10 @@ export const stepOneSchema = z.object({
   lastName: z.string().nonempty('Введіть прізвище'),
   firstName: z.string().nonempty('Введіть ім’я'),
   middleName: z.string().optional(),
-  phone: z.string().nonempty('Введіть номер телефону'),
+  phone: z
+    .string()
+    .nonempty('Введіть номер телефону')
+    .regex(/^\+380\d{9}$/, 'Некоректний формат номера телефону'),
   email: z.string().nonempty('Введіть email').email('Неправильний формат'),
   dob: z.string().nonempty('Введіть дату народження'),
   sex: z.enum(['MALE', 'FEMALE'], {

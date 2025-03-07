@@ -74,6 +74,14 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
   });
 
   const decOnClose = () => {
+    if (isCodeBlocked) {
+      api
+        .delete<StatusResponseDto>(
+          `/public/remove-verification?email=${encodeURIComponent(patientData.email ?? '')}`,
+        )
+        .then((v) => console.log(v.status))
+        .catch((e) => console.log(e));
+    }
     setIsCodeBlocked(false);
     setStep(1);
     resetStep1();
@@ -183,6 +191,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               label="Електронна пошта"
               inputId="email"
               placeholder="example@vitalineph.com"
+              disabled={isCodeBlocked}
               error={errorsStep1.email?.message}
               register={registerStep1('email')}
             />
