@@ -3,10 +3,14 @@ import {
   AppointmentStatuses,
   appStatusToReadable,
 } from '../types/appointments';
-import { statementsTestData } from '../types/statements';
 import { FilterModalProps } from '../types/FilterModalProps';
 import '../styles/FilterModal.css';
 import Button from './Button';
+import api from '../service/axiosUtils';
+
+export interface AvailableServicesDto {
+  services: string[];
+}
 
 const FilterModal: React.FC<FilterModalProps> = ({
   isOpen,
@@ -22,12 +26,21 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      const distinctServices = Array.from(
-        new Set(statementsTestData.map((s) => s.service)),
-      );
-      setAllowedServices(distinctServices);
+      fetchServiceNames();
     }
   }, [isOpen]);
+
+  const fetchServiceNames = async () => {
+    try {
+      const response = await api.get<AvailableServicesDto>(
+        '/public/services/names',
+      );
+      setAllowedServices(response.services);
+    } catch (error) {
+      console.error('Error fetching service names:', error);
+      setAllowedServices([]);
+    }
+  };
 
   if (!isOpen) return null;
 

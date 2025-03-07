@@ -19,17 +19,18 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
 import {
+  AppointmentsRegistryDto,
   AppointmentStatuses,
-  appointmentsTestData,
   appStatusToReadable,
 } from '../types/appointments';
 import {
+  MedicalCardDto,
   MedicalCardRecordDto,
-  medicalCardRecordsTestData,
   MedicalCardRecordTypes,
 } from '../types/cardRecords';
 import NewAppointmentForm from '../components/NewAppointmentForm';
 import MedicalRecordForm from '../components/MedicalRecordForm';
+import api from '../service/axiosUtils';
 
 const PatientPage = () => {
   const [isAppointmentFormOpened, setIsAppointmentFormOpened] = useState(false);
@@ -39,6 +40,9 @@ const PatientPage = () => {
   const { id: ids } = useParams<RouteParams>();
   const id = Number(ids);
   const [p, setP] = useState<PatientsRegistryEntryDto | undefined>(undefined);
+  const [medicalCard, setMedicalCard] = useState<MedicalCardDto | null>(null);
+  const [appointmentsRegistry, setAppointmentsRegistry] =
+    useState<AppointmentsRegistryDto | null>(null);
 
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
@@ -58,12 +62,47 @@ const PatientPage = () => {
       setP(patientData);
     } catch (error) {
       console.error(error);
+      toast.error('Не вдалось завантажити дані пацієнта');
+    }
+  };
+
+  const fetchMedicalRecords = async () => {
+    try {
+      const response = await api.get<MedicalCardDto>(
+        `/doctor/records?patientId=${id}`,
+      );
+      console.log(response);
+      setMedicalCard(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити медичні записи');
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await api.get<AppointmentsRegistryDto>(
+        `/registrar/patient-appointments?id=${id}`,
+      );
+      console.log(response);
+      setAppointmentsRegistry(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити записи на прийом');
     }
   };
 
   useEffect(() => {
     fetchPatient();
   }, [id]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [id, isAppointmentFormOpened]);
+
+  useEffect(() => {
+    fetchMedicalRecords();
+  }, [id, isMRFOpened]);
 
   const {
     register,
@@ -142,14 +181,15 @@ const PatientPage = () => {
     }
   };
 
-  const formatDate = (timestamp: number): string => {
-    const dateObj = new Date(timestamp);
-
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const year = dateObj.getFullYear();
-
-    return `${day}.${month}.${year}`;
+  const formatDate = (ts: number): string => {
+    if (!ts) return '-';
+    const date = new Date(ts);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hour = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hour}:${mins}`;
   };
 
   const getTypeLabel = (type: MedicalCardRecordDto['type']) => {
@@ -336,8 +376,8 @@ const PatientPage = () => {
               <h3>Візити до лікаря</h3>
 
               <div className="visits-list">
-                {appointmentsTestData?.length ? (
-                  appointmentsTestData.map((a, index) => (
+                {appointmentsRegistry ? (
+                  appointmentsRegistry.entries.map((a, index) => (
                     <div className="visit-card" key={index}>
                       <Input
                         type="text"
@@ -388,6 +428,7 @@ const PatientPage = () => {
                             ? a.id
                             : undefined
                         }
+                        onCancel={fetchAppointments}
                       />
                       <Input
                         type="text"
@@ -468,7 +509,7 @@ const PatientPage = () => {
           )}
         </div>
         <div className="medical-records-list">
-          {medicalCardRecordsTestData.map((record, idx) => (
+          {medicalCard?.entries?.map((record, idx) => (
             <div className="medical-record-card" key={idx}>
               <div className="mr-top-row">
                 <h4 className="mr-title">{record.title}</h4>
@@ -490,9 +531,9 @@ const PatientPage = () => {
                     ? record.analysisResults.map((res, i) => (
                         <li key={i}>
                           <a
-                            href={
-                              import.meta.env.VITE_CDN_BASE_URL + '/sample.pdf'
-                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={res}
                             style={{ textDecoration: 'underline' }}
                           >
                             {res}
