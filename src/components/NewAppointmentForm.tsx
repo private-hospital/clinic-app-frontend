@@ -406,7 +406,7 @@ export default function NewAppointmentForm({
                           placeholder=""
                           inputId={`appointments.${index}.date`}
                           error={errors.appointments?.[index]?.date?.message}
-                          disableErr={rowState.isDateDisabled}
+                          disableErr={true}
                           register={register(
                             `appointments.${index}.date` as const,
                           )}

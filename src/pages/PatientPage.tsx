@@ -328,6 +328,7 @@ const PatientPage = () => {
                     disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                     register={register('benefit')}
                     options={[
+                      { label: 'Без пільги', value: '' },
                       { label: 'Військові (знижка 20%)', value: 'military' },
                       {
                         label: 'Люди похилого віку (знижка 10%)',

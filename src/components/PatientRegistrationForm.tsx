@@ -106,7 +106,6 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
 
   const onSubmitStep3 = async (data: StepThreeData) => {
     const finalData = { ...patientData, ...data } as PatientData;
-    console.log(finalData);
     try {
       await api.post<StatusResponseDto, PatientData>(
         '/public/patients',
