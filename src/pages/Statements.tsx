@@ -10,16 +10,24 @@ import Pagination from '../components/Pagination';
 import {
   StatementFilterPropsDto,
   StatementRegistryDto,
-  statementsTestData,
 } from '../types/statements';
 import '../styles/Statements.css';
 import Button from '../components/Button';
 import FilterButton from '../components/FilterButton';
 import FilterModal from '../components/FilterModal';
+import api from '../service/axiosUtils';
 
 const Statements = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState<StatementRegistryDto | null>(null);
+  const [filterProps, setFilterProps] = useState<StatementFilterPropsDto>({
+    sortBy: 'id',
+    order: 'asc',
+  });
+  const authCtx = useContext(AuthContext)!;
+  const navigate = useNavigate();
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -38,15 +46,6 @@ const Statements = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
-  const authCtx = useContext(AuthContext)!;
-  const [page, setPage] = useState(1);
-  const [data, setData] = useState<StatementRegistryDto | null>(null);
-  const [filterProps, setFilterProps] = useState<StatementFilterPropsDto>({
-    sortBy: 'id',
-    order: 'asc',
-  });
-
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.CLINIC_HEAD]);
   }, [navigate, authCtx]);
@@ -56,58 +55,82 @@ const Statements = () => {
   }, [filterProps]);
 
   useEffect(() => {
-    const perPage = 4;
-    let filteredEntries = statementsTestData;
+    fetchStatements();
+  }, [page, filterProps, filterProps]);
 
-    if (filterProps.statuses && filterProps.statuses.length > 0) {
-      filteredEntries = filteredEntries.filter((s) =>
-        filterProps.statuses?.includes(s.status),
-      );
+  const fetchStatements = async () => {
+    try {
+      const requestBody: StatementFilterPropsDto = {
+        services: filterProps.services || [],
+        statuses: filterProps.statuses || [],
+        sortBy: filterProps.sortBy || 'id',
+        order: filterProps.order || 'asc',
+      };
+
+      const response = await api.post<
+        StatementRegistryDto,
+        StatementFilterPropsDto
+      >(`/owner/statements?p=${page}&q=10`, requestBody);
+
+      console.log(requestBody);
+      console.log(response);
+
+      setData(response);
+    } catch (error) {
+      console.error('Error fetching statements:', error);
     }
+  };
 
-    if (filterProps.services && filterProps.services.length > 0) {
-      filteredEntries = filteredEntries.filter((s) =>
-        filterProps.services?.includes(s.service),
-      );
-    }
-
-    filteredEntries.sort((a, b) => {
-      const orderModifier = filterProps.order === 'asc' ? 1 : -1;
-      if (filterProps.sortBy === 'id') {
-        return (a.id - b.id) * orderModifier;
-      } else if (filterProps.sortBy === 'service') {
-        return a.service.localeCompare(b.service) * orderModifier;
-      } else if (filterProps.sortBy === 'endDate') {
-        const ad = a.endDate ?? 0;
-        const bd = b.endDate ?? 0;
-        return (ad - bd) * orderModifier;
+  function buildQueryParams(filterProps: StatementFilterPropsDto): string {
+    const params = new URLSearchParams();
+    if (filterProps.services) {
+      for (const service of filterProps.services) {
+        params.append('services', service);
       }
-      return 0;
-    });
+    }
+    if (filterProps.statuses) {
+      for (const status of filterProps.statuses) {
+        params.append('statuses', status);
+      }
+    }
+    if (filterProps.sortBy) {
+      params.set('sortBy', filterProps.sortBy);
+    }
+    if (filterProps.order) {
+      params.set('order', filterProps.order);
+    }
+    return params.toString();
+  }
 
-    const totalPages = Math.ceil(filteredEntries.length / perPage);
-    const startIndex = (page - 1) * perPage;
-    const pageEntries = filteredEntries.slice(startIndex, startIndex + perPage);
+  const downloadStatement = async (filterProps: StatementFilterPropsDto) => {
+    try {
+      const queryString = buildQueryParams(filterProps);
+      const response = await api.getBlob(
+        `/owner/statements/export?${queryString}`,
+      );
+      const fileBlob = new Blob([response], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(fileBlob);
+      window.open(fileURL, '_blank');
+    } catch (error) {
+      console.error('Error downloading statement PDF:', error);
+    }
+  };
 
-    console.log(filteredEntries);
-
-    setData({
-      totalPages,
-      perPage,
-      page,
-      entries: pageEntries,
-    });
-  }, [page, filterProps]);
-
-  const downloadStatement = () => {
-    window.open(
-      'https://cdn.vitalineph.com/sample.pdf',
-      'Statement',
-      'noopener',
-    );
+  const downloadInvoice = async (id: number) => {
+    try {
+      const response = await api.getBlob(
+        `/owner/invoices/export?invoiceId=${id}`,
+      );
+      const fileBlob = new Blob([response], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(fileBlob);
+      window.open(fileURL, '_blank');
+    } catch (error) {
+      console.error('Error downloading invoice PDF:', error);
+    }
   };
 
   const formatDate = (ts: number): string => {
+    if (!ts) return '-';
     const date = new Date(ts);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -123,12 +146,7 @@ const Statements = () => {
       <FilterModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onApply={(newFilter) => {
-          setFilterProps((prev) => ({
-            ...prev,
-            ...newFilter,
-          }));
-        }}
+        onApply={(newFilter) => setFilterProps(newFilter)}
       />
       <div className="s-registry-holder">
         <div className="s-controls-block">
@@ -138,7 +156,7 @@ const Statements = () => {
               type="primary"
               text="Завантажити відомість"
               isSubmit={false}
-              onClick={downloadStatement}
+              onClick={() => downloadStatement(filterProps)}
               css={{
                 width: 'fit-content',
                 height: '3rem',
@@ -201,13 +219,7 @@ const Statements = () => {
                         >
                           <button
                             type="button"
-                            onClick={() => {
-                              window.open(
-                                p.invoiceUrl,
-                                'Statement',
-                                'noopener',
-                              );
-                            }}
+                            onClick={() => downloadInvoice(p.invoiceId)}
                           >
                             Завантажити рахунок
                           </button>

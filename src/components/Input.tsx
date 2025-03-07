@@ -2,6 +2,8 @@ import { InputProperties } from '../types/InputProperties';
 import '../styles/Input.css';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 const Input = (p: InputProperties) => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -11,9 +13,19 @@ const Input = (p: InputProperties) => {
     setShowDropdown((prev) => !prev);
   };
 
-  const cancelHandler = () => {
-    setShowDropdown((prev) => !prev);
-    toast.success('Запис скасовано');
+  const cancelHandler = async () => {
+    try {
+      setShowDropdown((prev) => !prev);
+      await api.put<StatusResponseDto, object>(
+        `/doctor/appointments?id=${p.cancelId}`,
+        {},
+      );
+      if (p.onCancel) p.onCancel();
+      toast.success('Запис скасовано');
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось скасувати запис');
+    }
   };
 
   useEffect(() => {

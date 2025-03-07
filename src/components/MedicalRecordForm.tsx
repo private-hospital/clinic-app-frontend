@@ -12,21 +12,22 @@ import {
   createMedicalCardRecordSchema,
   MedicalCardRecordTypes,
 } from '../types/cardRecords';
+import api from '../service/axiosUtils';
+import { AvailableServicesDto } from './FilterModal';
+import { RouteParams, StatusResponseDto } from '../types/common';
+import { useParams } from 'react-router';
 
 interface MedicalRecordFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface ServiceOption {
-  id: string;
-  label: string;
-}
-
 const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { id } = useParams<RouteParams>();
+
   const {
     register,
     handleSubmit,
@@ -48,35 +49,75 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
     defaultValue: MedicalCardRecordTypes.DIAGNOSIS,
   });
 
-  const [availableServices, setAvailableServices] = useState<ServiceOption[]>(
-    [],
-  );
+  const [availableServices, setAvailableServices] =
+    useState<AvailableServicesDto | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchAvailableServices = async () => {
+    try {
+      const response = await api.get<AvailableServicesDto>(
+        '/public/services/names',
+      );
+      setAvailableServices(response);
+    } catch (error) {
+      console.error('Error fetching service names:', error);
+      setAvailableServices(null);
+    }
+  };
 
   useEffect(() => {
-    if (selectedType === MedicalCardRecordTypes.NECESSARY_EXAMINATIONS) {
-      // TODO implement
-      setTimeout(() => {
-        setAvailableServices([
-          { id: 'service1', label: 'УЗД' },
-          { id: 'service2', label: 'КТ' },
-          { id: 'service3', label: 'МРТ' },
-          { id: 'service4', label: 'ЕХО' },
-          { id: 'service5', label: 'Рентген' },
-          { id: 'service6', label: 'Лабораторне обстеження' },
-        ]);
-      }, 100);
+    if (
+      selectedType === MedicalCardRecordTypes.NECESSARY_EXAMINATIONS &&
+      !availableServices
+    ) {
+      fetchAvailableServices();
     }
   }, [selectedType]);
 
   const onSubmit = async (data: CreateMedicalCardRecordDto) => {
-    if (data.analysisResults) {
-      const files = Array.from(data.analysisResults);
-      console.log('Analysis Results Files:', files);
+    try {
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('type', data.type);
+
+      if (data.diagnosis) {
+        formData.append('diagnosis', data.diagnosis);
+      }
+
+      if (data.examinations) {
+        data.examinations.forEach((exam) => {
+          formData.append('examinations', exam);
+        });
+      }
+
+      if (data.analysisResults) {
+        Array.from(data.analysisResults).forEach((file) => {
+          formData.append('analysisResults', file);
+        });
+      }
+
+      await api.post<StatusResponseDto, FormData>(
+        `/doctor/records?patientId=${id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      toast.success('Медичний запис успішно додано');
+      reset();
+      onClose();
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось зберегти медичний запис');
+    } finally {
+      setIsLoading(false);
     }
-    console.log('Submitted Data:', data);
-    toast.success('Медичний запис успішно додано');
-    reset();
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -217,34 +258,34 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
                   borderRadius: '4px',
                 }}
               >
-                {availableServices.map((service) => (
-                  <label
-                    key={service.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginBottom: '0.5rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      value={service.id}
-                      {...register('examinations')}
-                    />
-                    <span style={{ marginLeft: '0.5rem' }}>
-                      {service.label}
-                    </span>
-                  </label>
-                ))}
+                {availableServices &&
+                  availableServices.services.map((service) => (
+                    <label
+                      key={service}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '0.5rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        value={service}
+                        {...register('examinations')}
+                      />
+                      <span style={{ marginLeft: '0.5rem' }}>{service}</span>
+                    </label>
+                  ))}
               </div>
             </div>
           )}
 
           <Button
-            type="primary"
-            text="Зберегти запис"
+            type={isLoading ? 'secondary' : 'primary'}
+            text={isLoading ? 'Збереження...' : 'Зберегти запис'}
             isSubmit={true}
+            disabled={isLoading}
             css={{
               width: 'fit-content',
               fontSize: '1.3rem',

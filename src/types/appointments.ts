@@ -33,7 +33,8 @@ import { z } from 'zod';
 
 export const appointmentRowSchema = z.object({
   service: z.string().nonempty('Оберіть послугу'),
-  doctorName: z.string().nonempty('Оберіть лікаря'),
+  doctorId: z.string().nonempty('Оберіть лікаря'), // send this to backend
+  doctorName: z.string(), // display this on step 2 (can be optional)
   date: z.string().nonempty('Оберіть дату прийому'),
   time: z.string().nonempty('Оберіть час'),
 });

@@ -14,5 +14,6 @@ export interface InputProperties {
   disableErr?: boolean;
   disabled?: boolean;
   cancelId?: number;
+  onCancel?: () => void;
   defaultValue?: string | number;
 }
