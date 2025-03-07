@@ -46,7 +46,7 @@ const RegistryPage = () => {
   const fetchData = async () => {
     try {
       const response = await api.get<PatientsRegistryDto>(
-        `/public/registry?p=${page}&q=10`,
+        `/public/registry?p=${page}&q=5&s=${encodeURIComponent(searchQuery)}`,
       );
       setData(response);
       setFilteredData(response.entries); // Ініціалізуємо відфільтровані дані
@@ -71,7 +71,7 @@ const RegistryPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, isFormOpen]);
+  }, [page, searchQuery, isFormOpen]);
 
   return (
     <div className="auth-body">
