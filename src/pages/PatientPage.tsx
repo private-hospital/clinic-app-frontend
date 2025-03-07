@@ -156,7 +156,6 @@ const PatientPage = () => {
 
   const onSubmit = async (data: PatientEditFormData) => {
     try {
-      // Приклад: виконуємо PUT (або PATCH) на ендпоінт /public/patient/:id
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`,
         {
@@ -277,7 +276,7 @@ const PatientPage = () => {
                   placeholder="+380501112233"
                   error={errors.phone?.message}
                   register={register('phone')}
-                  disabled={true}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   css={
                     errors.phone?.message ? {} : { backgroundColor: 'white' }
                   }
@@ -289,7 +288,7 @@ const PatientPage = () => {
                   inputId="email"
                   placeholder="example@vitalineph.com"
                   error={errors.email?.message}
-                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
+                  disabled={true}
                   register={register('email')}
                   css={
                     errors.email?.message ? {} : { backgroundColor: 'white' }
