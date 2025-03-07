@@ -26,15 +26,13 @@ const RegistryPage = () => {
   const handleSearchBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
-    if (!data) return;
+  };
 
   const fetchData = async () => {
     try {
       const response = await api.get<PatientsRegistryDto>(
-        `/public/registry?p=${page}&q=10`,
+        `/public/registry?p=${page}&q=10&s=${searchQuery}`,
       );
-      console.log(response);
       setData(response);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -116,8 +114,9 @@ const RegistryPage = () => {
             </tr>
           </thead>
           <tbody>
-            {data.length > 0 ? (
-              data.map((p) => (
+            {data &&
+              data.entries.length > 0 &&
+              data.entries.map((p) => (
                 <tr onClick={() => navigate(`/patient/${p.id}`)} key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.fullname}</td>
@@ -127,14 +126,7 @@ const RegistryPage = () => {
                   <td>{fromSex(p.sex)}</td>
                   <td>{fromBenefit(p.benefit)}</td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} style={{ textAlign: 'center' }}>
-                  Немає записів
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
         </table>
         {(!data || data.entries.length === 0) && (
