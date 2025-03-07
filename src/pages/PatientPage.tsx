@@ -277,7 +277,7 @@ const PatientPage = () => {
                   placeholder="+380501112233"
                   error={errors.phone?.message}
                   register={register('phone')}
-                  disabled={true}
+                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                   css={
                     errors.phone?.message ? {} : { backgroundColor: 'white' }
                   }
@@ -289,7 +289,7 @@ const PatientPage = () => {
                   inputId="email"
                   placeholder="example@vitalineph.com"
                   error={errors.email?.message}
-                  disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
+                  disabled={true}
                   register={register('email')}
                   css={
                     errors.email?.message ? {} : { backgroundColor: 'white' }
@@ -328,6 +328,7 @@ const PatientPage = () => {
                     disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
                     register={register('benefit')}
                     options={[
+                      { label: 'Без пільги', value: '' },
                       { label: 'Військові (знижка 20%)', value: 'military' },
                       {
                         label: 'Люди похилого віку (знижка 10%)',

@@ -33,7 +33,11 @@ export const createMedicalCardRecordSchema = z
         (files) => !files || (files.length > 0 && files.length <= 5),
         'Необхідно завантажити від 1 до 5 PDF файлів',
       ),
-    examinations: z.array(z.string()).optional(),
+    examinations: z
+      .array(z.string(), {
+        invalid_type_error: 'Оберіть хоча б одне значення',
+      })
+      .nonempty('Оберіть хоча б одне значення'),
   })
   .refine(
     (data) => {

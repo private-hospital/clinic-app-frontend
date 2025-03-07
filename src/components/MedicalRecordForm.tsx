@@ -240,9 +240,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
               }}
             >
               <div className="labels-holder" style={{ marginBottom: '0.5rem' }}>
-                <label className="label-text">
-                  Обстеження (виберіть одну або декілька послуг)
-                </label>
+                <label className="label-text">Обстеження</label>
                 {errors.examinations && (
                   <p className="label-text error-message">
                     {errors.examinations.message}

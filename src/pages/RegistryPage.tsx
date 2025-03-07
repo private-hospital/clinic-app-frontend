@@ -14,6 +14,7 @@ import api from '../service/axiosUtils';
 const RegistryPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [data, setData] = useState<PatientsRegistryDto | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
@@ -23,15 +24,15 @@ const RegistryPage = () => {
   }, [navigate, authCtx]);
 
   const handleSearchBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
   };
 
   const fetchData = async () => {
     try {
       const response = await api.get<PatientsRegistryDto>(
-        `/public/registry?p=${page}&q=10`,
+        `/public/registry?p=${page}&q=10&s=${searchQuery}`,
       );
-      console.log(response);
       setData(response);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -54,7 +55,7 @@ const RegistryPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, isFormOpen]);
+  }, [page, searchQuery, isFormOpen]);
 
   return (
     <div className="auth-body">
@@ -63,6 +64,7 @@ const RegistryPage = () => {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
       />
+
       <div className="registry-holder">
         <div className="controls-block">
           <h1 className="page-title">Реєстр пацієнтів</h1>
@@ -80,6 +82,7 @@ const RegistryPage = () => {
                 onChange={handleSearchBarChange}
                 className="search-input"
                 placeholder="Пошук"
+                value={searchQuery}
               />
             </div>
             {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
@@ -112,19 +115,18 @@ const RegistryPage = () => {
           </thead>
           <tbody>
             {data &&
-              data.entries.map((p) => {
-                return (
-                  <tr onClick={() => navigate(`/patient/${p.id}`)} key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.fullname}</td>
-                    <td>{p.phone}</td>
-                    <td>{p.email}</td>
-                    <td>{p.dob}</td>
-                    <td>{fromSex(p.sex)}</td>
-                    <td>{fromBenefit(p.benefit)}</td>
-                  </tr>
-                );
-              })}
+              data.entries.length > 0 &&
+              data.entries.map((p) => (
+                <tr onClick={() => navigate(`/patient/${p.id}`)} key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.fullname}</td>
+                  <td>{p.phone}</td>
+                  <td>{p.email}</td>
+                  <td>{p.dob}</td>
+                  <td>{fromSex(p.sex)}</td>
+                  <td>{fromBenefit(p.benefit)}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
         {(!data || data.entries.length === 0) && (
