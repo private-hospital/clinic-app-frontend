@@ -13,6 +13,8 @@ import '../styles/PatientRegistrationForm.css';
 import { toast } from 'react-toastify';
 import Button from './Button';
 import Select from './Select';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 type StepOneData = ReturnType<typeof stepOneSchema.parse>;
 type StepTwoData = ReturnType<typeof stepTwoSchema.parse>;
@@ -86,16 +88,26 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
   };
 
   const onSubmitStep2 = (data: StepTwoData) => {
-    setPatientData((prev) => ({ ...prev, ...data }));
+    console.log(data);
     setIsCodeBlocked(true);
     setStep(3);
   };
 
-  const onSubmitStep3 = (data: StepThreeData) => {
-    const d = { ...patientData, ...data } as PatientData;
-    console.log(d);
-    toast.success('Пацієнт був успішно доданий');
-    decOnClose();
+  const onSubmitStep3 = async (data: StepThreeData) => {
+    const finalData = { ...patientData, ...data } as PatientData;
+    console.log(finalData);
+    try {
+      await api.post<StatusResponseDto, PatientData>(
+        '/public/patients',
+        finalData,
+      );
+
+      toast.success('Пацієнт був успішно доданий');
+      decOnClose();
+    } catch (error) {
+      toast.error('Не вдалося додати пацієнта');
+      console.error('Error:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -179,8 +191,8 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               error={errorsStep1.sex?.message}
               register={registerStep1('sex')}
               options={[
-                { label: 'Чоловік', value: 'MALE' },
-                { label: 'Жінка', value: 'FEMALE' },
+                { label: 'Чоловіча', value: 'MALE' },
+                { label: 'Жіноча', value: 'FEMALE' },
               ]}
             />
 
@@ -316,11 +328,14 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
               <label htmlFor="benefit">Пільгова група (необов’язково)</label>
               <select id="benefit" {...registerStep3('benefit')}>
                 <option value="">Без пільг</option>
-                <option value="family">
+                <option value="military">Військові (знижка 20%)</option>
+                <option value="elderly">Люди похилого віку (знижка 10%)</option>
+                <option value="disabled">
+                  Люди з інвалідністю (знижка 5%)
+                </option>
+                <option value="staff_family">
                   Члени родин працівників (знижка 40%)
                 </option>
-                <option value="students">Студенти (знижка 20%)</option>
-                <option value="pensioners">Пенсіонери (знижка 30%)</option>
               </select>
               {errorsStep3.benefit && (
                 <span style={{ color: 'red' }}>

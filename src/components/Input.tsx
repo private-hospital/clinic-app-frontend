@@ -74,7 +74,11 @@ const Input = (p: InputProperties) => {
       <div className="input-wrapper" ref={dropdownRef}>
         {showDropdown && (
           <div className="dropdown-menu">
-            <button type="button" onClick={cancelHandler}>
+            <button
+              type="button"
+              onClick={cancelHandler}
+              style={{ width: '100%' }}
+            >
               Скасувати
             </button>
           </div>

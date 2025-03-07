@@ -7,17 +7,16 @@ import Header from '../components/Header';
 import '../styles/authPages.css';
 import Select from '../components/Select';
 import Pagination from '../components/Pagination';
-import {
-  PriceListRegistryDto,
-  PriceListState,
-  priceListsTestData,
-} from '../types/priceLists';
+import { PriceListRegistryDto, PriceListState } from '../types/priceLists';
 import '../styles/PriceLists.css';
 import PriceListForm from '../components/PriceListForm';
-import { ServiceRegistryDto, serviceRegistryTestData } from '../types/services';
+import { ServiceRegistryDto } from '../types/services';
 import Button from '../components/Button';
 import { toast } from 'react-toastify';
 import ServiceForm from '../components/ServiceForm';
+import ArchivePriceListForm from '../components/ArchivePriceListForm';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 const PriceLists = () => {
   const navigate = useNavigate();
@@ -30,6 +29,28 @@ const PriceLists = () => {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [isPLFormOpen, setIsPLFormOpen] = useState(false);
   const [isSFormOpen, setIsSFormOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [archivePLId, setArchivePLId] = useState<number | null>(null);
+
+  const handleArchivePL = (id: number): void => {
+    setArchivePLId(id);
+    setIsArchiveModalOpen(true);
+  };
+
+  const archivePriceList = async (reason: string) => {
+    if (archivePLId == null) return;
+    try {
+      await api.put<StatusResponseDto, { reason: string }>(
+        `/owner/price-lists?id=${archivePLId}`,
+        { reason },
+      );
+      toast.success('Прайс лист був успішно архівований');
+      setIsArchiveModalOpen(false);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось архівувати прайс лист');
+    }
+  };
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -59,61 +80,82 @@ const PriceLists = () => {
     setPagePL(1);
   }, [isArchived]);
 
-  useEffect(() => {
-    const perPage = 4;
-    const filteredEntries = priceListsTestData.filter(
-      (p) => p.isArchived === isArchived,
-    );
-    const totalPages = Math.ceil(filteredEntries.length / perPage);
-    const startIndex = (pagePL - 1) * perPage;
-    const pageEntries = filteredEntries.slice(startIndex, startIndex + perPage);
-
-    setPLData({
-      totalPages,
-      perPage,
-      page: pagePL,
-      entries: pageEntries,
-    });
-  }, [pagePL, isArchived, setPLData]);
+  const fetchPriceLists = async () => {
+    try {
+      const response = await api.get<PriceListRegistryDto>(
+        `/owner/price-lists?p=${pagePL}&q=10&a=${isArchived}`,
+      );
+      console.log(response);
+      setPLData(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити прайс листи');
+    }
+  };
 
   useEffect(() => {
-    const perPage = 10;
-    const totalPages = Math.ceil(serviceRegistryTestData.length / perPage);
-    const startIndex = (pageS - 1) * perPage;
-    const pageEntries = serviceRegistryTestData.slice(
-      startIndex,
-      startIndex + perPage,
-    );
+    fetchPriceLists();
+  }, [
+    pagePL,
+    isArchived,
+    isArchiveModalOpen,
+    openDropdownId,
+    isPLFormOpen,
+    setPLData,
+  ]);
 
-    setSData({
-      totalPages,
-      perPage,
-      page: pageS,
-      entries: pageEntries,
-    });
-  }, [pageS, setSData]);
-
-  const handleUnarchive = (id: number): void => {
-    // TODO unarchive
-    console.log(id);
-    toast.success('Послугу було успішно актуалізовано');
+  const fetchServices = async () => {
+    try {
+      const response = await api.get<ServiceRegistryDto>(
+        `/owner/services?p=${pageS}&q=10`,
+      );
+      console.log(response);
+      setSData(response);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось завантажити послуги');
+    }
   };
 
-  const handleArchive = (id: number): void => {
-    console.log(id);
-    toast.success('Послугу було успішно архівовано');
+  useEffect(() => {
+    fetchServices();
+  }, [pageS, plData, isSFormOpen, setSData]);
+
+  const handleUnarchive = async (id: number): Promise<void> => {
+    try {
+      await api.put<StatusResponseDto, object>(`/owner/services?id=${id}`, {});
+      console.log(id);
+      toast.success('Послугу було успішно актуалізовано');
+      fetchServices();
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось актуалізувати послугу');
+    }
   };
 
-  const handleMakePLActive = (id: number): void => {
-    console.log(id);
-    toast.success('Прайс лист був успішно активований');
-    toggleDropdown(id);
+  const handleArchive = async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/owner/services?id=${id}`);
+      toast.success('Послугу було успішно архівовано');
+      fetchServices();
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось архівувати послугу');
+    }
   };
 
-  const handleArchivePL = (id: number): void => {
-    console.log(id);
-    toast.success('Прайс лист був успішно архівований');
-    toggleDropdown(id);
+  const handleMakePLActive = async (id: number): Promise<void> => {
+    try {
+      await api.post<StatusResponseDto, null>(
+        `/owner/price-lists/active?id=${id}`,
+        null,
+      );
+      toast.success('Прайс лист був успішно активований');
+      toggleDropdown(id);
+    } catch (e) {
+      console.log(e);
+      toast.error('Не вдалось активувати прайс лист');
+    }
   };
 
   const formatDate = (ts: number): string => {
@@ -132,6 +174,11 @@ const PriceLists = () => {
       <PriceListForm
         isOpen={isPLFormOpen}
         onClose={() => setIsPLFormOpen(false)}
+      />
+      <ArchivePriceListForm
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        onArchive={archivePriceList}
       />
       <ServiceForm isOpen={isSFormOpen} onClose={() => setIsSFormOpen(false)} />
       <div className="a-registry-holder">
@@ -232,7 +279,10 @@ const PriceLists = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleArchivePL(p.id)}
+                            onClick={() => {
+                              handleArchivePL(p.id);
+                              toggleDropdown(p.id);
+                            }}
                           >
                             Архівувати
                           </button>

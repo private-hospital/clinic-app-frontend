@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AppointmentStatuses } from '../types/appointments';
+import {
+  AppointmentStatuses,
+  appStatusToReadable,
+} from '../types/appointments';
 import { statementsTestData } from '../types/statements';
 import { FilterModalProps } from '../types/FilterModalProps';
 import '../styles/FilterModal.css';
@@ -114,7 +117,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 checked={statuses.includes(status)}
                 onChange={() => toggleStatus(status)}
               />
-              {status}
+              {appStatusToReadable(status)}
             </label>
           ))}
         </div>

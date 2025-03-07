@@ -10,11 +10,13 @@ import { useNavigate } from 'react-router';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '../components/AuthContext';
 import { getTokenPayload } from '../service/authUtils';
+import { JwtPayload } from '../types/jwt';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
 
+  // Перевіряємо, чи є токен в контексті, якщо так, перенаправляємо на головну сторінку
   useEffect(() => {
     if (authCtx.tokenPayload) {
       goToMainPage(navigate, authCtx.tokenPayload.role);
@@ -33,49 +35,44 @@ const LoginPage = () => {
 
   const onSubmit = async (data: LoginFormDto) => {
     try {
-      console.log(data);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/login/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(data),
+        },
+      );
 
-      if (data.email.toLowerCase() === 'doctor@gmail.com') {
-        localStorage.setItem(
-          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJET0NUT1IifSwiaWF0IjoxNzQwOTI1ODk5LCJleHAiOjE3NDE3ODk4OTl9.zJ8-cKpdrk_9ra_8kmHlhGzegTE-teWEy3xUPETeaRk',
-        );
-      }
-      if (data.email.toLowerCase() === 'head@gmail.com') {
-        localStorage.setItem(
-          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJDTElOSUNfSEVBRCJ9LCJpYXQiOjE3NDA5MjY0NDksImV4cCI6MTc0MTc5MDQ0OX0.5VIVeWkHLXrF9kHaXBGBkm4Y1GwNJO2nq8MhH9ZUmu8',
-        );
-      }
-      if (data.email.toLowerCase() === 'registrar@gmail.com') {
-        localStorage.setItem(
-          import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOjEsInJvbGUiOiJSRUdJU1RSQVIifSwiaWF0IjoxNzQwOTI2NDE0LCJleHAiOjE3NDE3OTA0MTR9.LVwt0rOmF_y__Wcs1oU5pm4atJoUReRqDcNYbrrrQSs',
-        );
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Помилка авторизації');
       }
 
-      const token: string = localStorage.getItem(
-        import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!,
-      )!;
-      authCtx?.setTokenPayload(getTokenPayload(token));
+      // Збереження токена
+      const token = `Bearer ${result.payload.accessToken}`;
+      localStorage.setItem(import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME!, token);
 
-      toast.success('Успішна авторизація');
+      // Оновлення контексту авторизації
+      const tokenPayload: JwtPayload | null = getTokenPayload(
+        result.payload.accessToken,
+      );
 
-      console.log(authCtx);
-      goToMainPage(navigate, authCtx.tokenPayload?.role);
+      if (tokenPayload) {
+        authCtx?.setTokenPayload(tokenPayload);
+        toast.success('Успішна авторизація');
 
-      // Example API call (uncomment if needed)
-      // const response = await api.post<LoginResponseDto, LoginRequestDto>(
-      //   '/public/login',
-      //   data
-      // );
-      // localStorage.setItem(
-      //   import.meta.env.VITE_AUTH_TOKEN_LS_KEY_NAME ?? '',
-      //   response.accessToken
-      // );
-    } catch (error) {
-      toast.error('Не вдалось авторизуватись');
-      console.log(error);
+        // Перенаправлення після оновлення контексту
+        goToMainPage(navigate, tokenPayload.role); // Використовуємо role
+      } else {
+        toast.error('Помилка авторизації: не вдалося отримати токен.');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Не вдалося авторизуватись');
     }
   };
 
@@ -119,7 +116,7 @@ const LoginPage = () => {
           <Button
             type="primary"
             text="Вхід"
-            css={{ width: '100%', marginTop: '2rem' }}
+            css={{ width: '100%' }}
             isSubmit={true}
           />
         </form>

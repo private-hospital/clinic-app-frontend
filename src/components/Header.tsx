@@ -46,7 +46,7 @@ const Header = () => {
               }
             />
           </div>
-          <p className="user-name">Недашківська В.В.</p>
+          <p className="user-name"> {authCtx.tokenPayload?.fullname} </p>
         </div>
         <img
           className="logout"

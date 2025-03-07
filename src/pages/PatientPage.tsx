@@ -10,7 +10,6 @@ import {
   PatientEditFormData,
   patientEditSchema,
   PatientsRegistryEntryDto,
-  patientsTestData,
 } from '../types/patients';
 import { RouteParams } from '../types/common';
 import { useForm } from 'react-hook-form';
@@ -19,7 +18,11 @@ import { toast } from 'react-toastify';
 import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
-import { appointmentsTestData } from '../types/appointments';
+import {
+  AppointmentStatuses,
+  appointmentsTestData,
+  appStatusToReadable,
+} from '../types/appointments';
 import {
   MedicalCardRecordDto,
   medicalCardRecordsTestData,
@@ -41,9 +44,26 @@ const PatientPage = () => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
   }, [navigate, authCtx]);
 
+  const fetchPatient = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`,
+      );
+
+      if (!response.ok) {
+        throw new Error('Не вдалося отримати дані пацієнта');
+      }
+
+      const patientData: PatientsRegistryEntryDto = await response.json();
+      setP(patientData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    setP(patientsTestData.find((p) => p.id === id));
-  }, [setP, id]);
+    fetchPatient();
+  }, [id]);
 
   const {
     register,
@@ -64,6 +84,12 @@ const PatientPage = () => {
         ? new Date(p.dob).toISOString().slice(0, 10)
         : new Date(2000, 0, 1).toISOString().slice(0, 10),
       sex: p?.sex === 'FEMALE' ? 'FEMALE' : 'MALE',
+      benefit: p?.benefit as
+        | 'military'
+        | 'elderly'
+        | 'disabled'
+        | 'staff_family'
+        | undefined,
     },
   });
 
@@ -79,13 +105,41 @@ const PatientPage = () => {
           ? new Date(p.dob).toISOString().slice(0, 10)
           : new Date(2000, 0, 1).toISOString().slice(0, 10),
         sex: p?.sex === 'FEMALE' ? 'FEMALE' : 'MALE',
+        benefit: p?.benefit as
+          | 'military'
+          | 'elderly'
+          | 'disabled'
+          | 'staff_family'
+          | undefined,
       });
     }
   }, [p, reset]);
 
-  const onSubmit = (data: PatientEditFormData) => {
-    console.log('Form data:', data);
-    toast.success('Пацієнта збережено');
+  const onSubmit = async (data: PatientEditFormData) => {
+    try {
+      // Приклад: виконуємо PUT (або PATCH) на ендпоінт /public/patient/:id
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`,
+        {
+          method: 'PUT', // або PATCH
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Не вдалося оновити дані пацієнта');
+      }
+
+      toast.success('Пацієнта збережено');
+      // Опційно: можна викликати fetchPatient(), щоб одразу підвантажити оновлені дані
+      // fetchPatient();
+    } catch (error: any) {
+      console.error(error);
+      toast.error('Сталася помилка при збереженні даних');
+    }
   };
 
   const formatDate = (timestamp: number): string => {
@@ -226,6 +280,36 @@ const PatientPage = () => {
                   css={errors.sex?.message ? {} : { backgroundColor: 'white' }}
                 />
 
+                <div className="benefit-group-style">
+                  <Select
+                    label="Пільгова група"
+                    selectId="benefit"
+                    error={errors.benefit?.message}
+                    disabled={authCtx.tokenPayload?.role === UserRoles.DOCTOR}
+                    register={register('benefit')}
+                    options={[
+                      { label: 'Військові (знижка 20%)', value: 'military' },
+                      {
+                        label: 'Люди похилого віку (знижка 10%)',
+                        value: 'elderly',
+                      },
+                      {
+                        label: 'Люди з інвалідністю (знижка 5%)',
+                        value: 'disabled',
+                      },
+                      {
+                        label: 'Члени родин працівників (знижка 40%)',
+                        value: 'staff_family',
+                      },
+                    ]}
+                    css={
+                      errors.benefit?.message
+                        ? {}
+                        : { backgroundColor: 'white' }
+                    }
+                  />
+                </div>
+
                 {authCtx.tokenPayload?.role === UserRoles.REGISTRAR && (
                   <Button
                     type="primary"
@@ -286,13 +370,13 @@ const PatientPage = () => {
                         label="Статус прийому"
                         placeholder=""
                         inputId={`status-${index}`}
-                        value={a.status}
+                        value={appStatusToReadable(a.status)}
                         disabled={true}
                         css={{
                           color:
-                            a.status === 'Завершений'
+                            a.status === AppointmentStatuses.PLANNED
                               ? '#00b11d'
-                              : a.status === 'Запланований'
+                              : a.status === AppointmentStatuses.COMPLETED
                                 ? '#4699e6'
                                 : '#c70000',
                           fontWeight: 200,
@@ -300,7 +384,7 @@ const PatientPage = () => {
                         }}
                         cancelId={
                           authCtx.tokenPayload?.role === 'REGISTRAR' &&
-                          a.status === 'Запланований'
+                          a.status === AppointmentStatuses.PLANNED
                             ? a.id
                             : undefined
                         }

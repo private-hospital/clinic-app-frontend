@@ -14,117 +14,47 @@ import { UserRoles } from '../types/users';
 import '../styles/authPages.css';
 import Header from '../components/Header';
 import '../styles/Statistics.css';
+import api from '../service/axiosUtils';
 
-const dailyData = [
-  { date: '24.02', count: 12 },
-  { date: '25.02', count: 18 },
-  { date: '26.02', count: 10 },
-  { date: '27.02', count: 22 },
-  { date: '28.02', count: 16 },
-  { date: '01.03', count: 25 },
-  { date: '02.03', count: 14 },
-];
+interface WeeklyStatsDto {
+  entries: WeeklyStatsEntryDto[];
+}
+interface WeeklyStatsEntryDto {
+  date: string;
+  count: number;
+}
 
-const hourlyData = [
-  { hour: '09:00', count: 2 },
-  { hour: '10:00', count: 5 },
-  { hour: '11:00', count: 8 },
-  { hour: '12:00', count: 10 },
-  { hour: '13:00', count: 7 },
-  { hour: '14:00', count: 12 },
-  { hour: '15:00', count: 9 },
-  { hour: '16:00', count: 11 },
-  { hour: '17:00', count: 6 },
-  { hour: '18:00', count: 4 },
-];
+interface DailyCumulateDto {
+  entries: DailyCumulateEntryDto[];
+}
+interface DailyCumulateEntryDto {
+  hour: string;
+  count: number;
+}
 
-const doctors = [
-  { id: '1', name: 'Петренко Андрій Сергійович' },
-  { id: '2', name: 'Сидорук Марія Василівна' },
-  { id: '3', name: 'Мельник Ольга Ігорівна' },
-  { id: '4', name: 'Недашківська Валерія Павлівна' },
-];
+interface DoctorRegistryDto {
+  entries: DoctorEntryDto[];
+}
+interface DoctorEntryDto {
+  id: number;
+  name: string;
+}
 
-const doctorStatsData: Record<string, { date: string; count: number }[]> = {
-  '1': [
-    { date: '24.02', count: 5 },
-    { date: '25.02', count: 9 },
-    { date: '26.02', count: 7 },
-    { date: '27.02', count: 11 },
-    { date: '28.02', count: 9 },
-    { date: '29.02', count: 7 },
-    { date: '30.02', count: 11 },
-  ],
-  '2': [
-    { date: '24.02', count: 3 },
-    { date: '25.02', count: 2 },
-    { date: '26.02', count: 6 },
-    { date: '27.02', count: 8 },
-    { date: '28.02', count: 9 },
-    { date: '29.02', count: 7 },
-    { date: '30.02', count: 11 },
-  ],
-  '3': [
-    { date: '24.02', count: 10 },
-    { date: '25.02', count: 5 },
-    { date: '26.02', count: 2 },
-    { date: '27.02', count: 9 },
-    { date: '28.02', count: 9 },
-    { date: '29.02', count: 7 },
-    { date: '30.02', count: 11 },
-  ],
-  '4': [
-    { date: '24.02', count: 2 },
-    { date: '25.02', count: 3 },
-    { date: '26.02', count: 5 },
-    { date: '27.02', count: 7 },
-    { date: '28.02', count: 9 },
-    { date: '29.02', count: 7 },
-    { date: '30.02', count: 11 },
-  ],
-};
+interface DoctorDailyCountsDto {
+  entries: DoctorDailyCountDto[];
+}
+interface DoctorDailyCountDto {
+  date: string;
+  count: number;
+}
 
-const doctorRevenueStatsData: Record<
-  string,
-  { date: string; count: number }[]
-> = {
-  '1': [
-    { date: '24.02', count: 5900 },
-    { date: '25.02', count: 5444 },
-    { date: '26.02', count: 7000 },
-    { date: '27.02', count: 11000 },
-    { date: '28.02', count: 9000 },
-    { date: '29.02', count: 1000 },
-    { date: '30.02', count: 11550 },
-  ],
-  '2': [
-    { date: '24.02', count: 3423 },
-    { date: '25.02', count: 2645 },
-    { date: '26.02', count: 6422 },
-    { date: '27.02', count: 8000 },
-    { date: '28.02', count: 9000 },
-    { date: '29.02', count: 1000 },
-    { date: '30.02', count: 11550 },
-  ],
-  '3': [
-    { date: '24.02', count: 10000 },
-    { date: '25.02', count: 5000 },
-    { date: '26.02', count: 2000 },
-    { date: '27.02', count: 9000 },
-    { date: '28.02', count: 9000 },
-    { date: '29.02', count: 1000 },
-    { date: '30.02', count: 11550 },
-  ],
-  '4': [
-    { date: '24.02', count: 2655 },
-    { date: '25.02', count: 3999 },
-    { date: '26.02', count: 5000 },
-    { date: '27.02', count: 12300 },
-    { date: '28.02', count: 9000 },
-    { date: '29.02', count: 1000 },
-    { date: '30.02', count: 11550 },
-  ],
-};
+interface DoctorDailyRevenuesDto {
+  entries: DoctorDailyRevenueDto[];
+}
+interface DoctorDailyRevenueDto {
+  date: string;
+  count: number;
+}
 
 function useResizeObserver(): [React.RefObject<HTMLDivElement | null>, number] {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -152,7 +82,10 @@ function useResizeObserver(): [React.RefObject<HTMLDivElement | null>, number] {
   return [containerRef, width];
 }
 
-const DailyBarChart: React.FC = () => {
+interface DailyBarChartProps {
+  data: WeeklyStatsEntryDto[];
+}
+const DailyBarChart: React.FC<DailyBarChartProps> = ({ data }) => {
   const [containerRef, containerWidth] = useResizeObserver();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -172,19 +105,19 @@ const DailyBarChart: React.FC = () => {
 
     const x = d3
       .scaleBand()
-      .domain(dailyData.map((d) => d.date))
+      .domain(data.map((d) => d.date))
       .range([margin.left, width - margin.right])
       .padding(0.2);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(dailyData, (d) => d.count) ?? 0])
+      .domain([0, d3.max(data, (d) => d.count) ?? 0])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
     svg
       .selectAll('.bar')
-      .data(dailyData)
+      .data(data)
       .enter()
       .append('rect')
       .attr('class', 'bar bar-blue')
@@ -219,7 +152,7 @@ const DailyBarChart: React.FC = () => {
       .attr('y', margin.left - 45)
       .attr('x', -(height - margin.top - margin.bottom) / 2 - margin.top)
       .text('Кількість оглянутих пацієнтів');
-  }, [containerWidth]);
+  }, [data, containerWidth]);
 
   return (
     <div ref={containerRef} className="chart-responsive-wrapper">
@@ -228,7 +161,10 @@ const DailyBarChart: React.FC = () => {
   );
 };
 
-const HourlyLineChart: React.FC = () => {
+interface HourlyLineChartProps {
+  data: DailyCumulateEntryDto[];
+}
+const HourlyLineChart: React.FC<HourlyLineChartProps> = ({ data }) => {
   const [containerRef, containerWidth] = useResizeObserver();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -248,29 +184,29 @@ const HourlyLineChart: React.FC = () => {
 
     const x = d3
       .scalePoint()
-      .domain(hourlyData.map((d) => d.hour))
+      .domain(data.map((d) => d.hour))
       .range([margin.left, width - margin.right]);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(hourlyData, (d) => d.count) ?? 0])
+      .domain([0, d3.max(data, (d) => d.count) ?? 0])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
     const line = d3
-      .line<{ hour: string; count: number }>()
+      .line<DailyCumulateEntryDto>()
       .x((d) => x(d.hour) ?? 0)
       .y((d) => y(d.count));
 
     svg
       .append('path')
-      .datum(hourlyData)
+      .datum(data)
       .attr('class', 'line line-purple')
       .attr('d', line ?? '');
 
     svg
       .selectAll('.dot')
-      .data(hourlyData)
+      .data(data)
       .enter()
       .append('circle')
       .attr('class', 'dot dot-purple')
@@ -304,7 +240,7 @@ const HourlyLineChart: React.FC = () => {
       .attr('y', margin.left - 45)
       .attr('x', -(height - margin.top - margin.bottom) / 2 - margin.top)
       .text('Кількість оглянутих пацієнтів');
-  }, [containerWidth]);
+  }, [data, containerWidth]);
 
   return (
     <div ref={containerRef} className="chart-responsive-wrapper">
@@ -313,15 +249,14 @@ const HourlyLineChart: React.FC = () => {
   );
 };
 
-const DoctorPatientsBarChart: React.FC<{ doctorId: string }> = ({
-  doctorId,
+interface DoctorPatientsBarChartProps {
+  data: DoctorDailyCountDto[];
+}
+const DoctorPatientsBarChart: React.FC<DoctorPatientsBarChartProps> = ({
+  data,
 }) => {
   const [containerRef, containerWidth] = useResizeObserver();
   const svgRef = useRef<SVGSVGElement | null>(null);
-
-  const chartData = useMemo(() => {
-    return doctorStatsData[doctorId] || [];
-  }, [doctorId]);
 
   useEffect(() => {
     if (!svgRef.current || containerWidth === 0) return;
@@ -339,19 +274,19 @@ const DoctorPatientsBarChart: React.FC<{ doctorId: string }> = ({
 
     const x = d3
       .scaleBand()
-      .domain(chartData.map((d) => d.date))
+      .domain(data.map((d) => d.date))
       .range([margin.left, width - margin.right])
       .padding(0.2);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData, (d) => d.count) ?? 0])
+      .domain([0, d3.max(data, (d) => d.count) ?? 0])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
     svg
       .selectAll('.bar')
-      .data(chartData)
+      .data(data)
       .enter()
       .append('rect')
       .attr('class', 'bar bar-orange')
@@ -386,7 +321,7 @@ const DoctorPatientsBarChart: React.FC<{ doctorId: string }> = ({
       .attr('y', margin.left - 45)
       .attr('x', -(height - margin.top - margin.bottom) / 2 - margin.top)
       .text('Кількість оглянутих пацієнтів');
-  }, [doctorId, containerWidth, chartData]);
+  }, [data, containerWidth]);
 
   return (
     <div ref={containerRef} className="chart-responsive-wrapper">
@@ -395,15 +330,14 @@ const DoctorPatientsBarChart: React.FC<{ doctorId: string }> = ({
   );
 };
 
-const DoctorRevenueBarChart: React.FC<{ doctorId: string }> = ({
-  doctorId,
+interface DoctorRevenueBarChartProps {
+  data: DoctorDailyRevenueDto[];
+}
+const DoctorRevenueBarChart: React.FC<DoctorRevenueBarChartProps> = ({
+  data,
 }) => {
   const [containerRef, containerWidth] = useResizeObserver();
   const svgRef = useRef<SVGSVGElement | null>(null);
-
-  const chartData = useMemo(() => {
-    return doctorRevenueStatsData[doctorId] || [];
-  }, [doctorId]);
 
   useEffect(() => {
     if (!svgRef.current || containerWidth === 0) return;
@@ -421,19 +355,19 @@ const DoctorRevenueBarChart: React.FC<{ doctorId: string }> = ({
 
     const x = d3
       .scaleBand()
-      .domain(chartData.map((d) => d.date))
+      .domain(data.map((d) => d.date))
       .range([margin.left, width - margin.right])
       .padding(0.2);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData, (d) => d.count) ?? 0])
+      .domain([0, d3.max(data, (d) => d.count) ?? 0])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
     svg
       .selectAll('.bar')
-      .data(chartData)
+      .data(data)
       .enter()
       .append('rect')
       .attr('class', 'bar bar-orange')
@@ -468,7 +402,7 @@ const DoctorRevenueBarChart: React.FC<{ doctorId: string }> = ({
       .attr('y', margin.left - 45)
       .attr('x', -(height - margin.top - margin.bottom) / 2 - margin.top)
       .text('Сума, грн');
-  }, [doctorId, containerWidth, chartData]);
+  }, [data, containerWidth]);
 
   return (
     <div ref={containerRef} className="chart-responsive-wrapper">
@@ -480,7 +414,17 @@ const DoctorRevenueBarChart: React.FC<{ doctorId: string }> = ({
 const Statistics: React.FC = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
-  const [doctorId, setDoctorId] = useState<string>('1');
+
+  const [weeklyStats, setWeeklyStats] = useState<WeeklyStatsEntryDto[]>([]);
+  const [todayCumulate, setTodayCumulate] = useState<DailyCumulateEntryDto[]>(
+    [],
+  );
+  const [doctors, setDoctors] = useState<DoctorEntryDto[]>([]);
+  const [doctorId, setDoctorId] = useState<string>('');
+  const [doctorCounts, setDoctorCounts] = useState<DoctorDailyCountDto[]>([]);
+  const [doctorRevenues, setDoctorRevenues] = useState<DoctorDailyRevenueDto[]>(
+    [],
+  );
 
   const handleDoctorChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setDoctorId(e.target.value);
@@ -488,12 +432,74 @@ const Statistics: React.FC = () => {
 
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.CLINIC_HEAD]);
-  }, [navigate, authCtx]);
+    fetchWeeklyStats();
+    fetchTodayCumulate();
+    fetchDoctors();
+  }, []);
+
+  useEffect(() => {
+    if (doctorId) {
+      fetchDoctorCounts(doctorId);
+      fetchDoctorRevenues(doctorId);
+    }
+  }, [doctorId]);
+
+  const fetchWeeklyStats = async () => {
+    try {
+      const response = await api.get<WeeklyStatsDto>('/owner/stats/week');
+      setWeeklyStats(response.entries);
+    } catch (error) {
+      console.error('Error fetching weekly stats:', error);
+    }
+  };
+
+  const fetchTodayCumulate = async () => {
+    try {
+      const response = await api.get<DailyCumulateDto>('/owner/stats/cumulate');
+      setTodayCumulate(response.entries);
+    } catch (error) {
+      console.error('Error fetching today cumulate:', error);
+    }
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await api.get<DoctorRegistryDto>('/public/doctors');
+      setDoctors(response.entries);
+      if (response.entries.length > 0) {
+        setDoctorId(response.entries[0].id.toString());
+      }
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
+
+  const fetchDoctorCounts = async (docId: string) => {
+    try {
+      const response = await api.get<DoctorDailyCountsDto>(
+        `/owner/stats/doctor/counts?doctorId=${docId}`,
+      );
+      setDoctorCounts(response.entries);
+    } catch (error) {
+      console.error('Error fetching doctor counts:', error);
+    }
+  };
+
+  const fetchDoctorRevenues = async (docId: string) => {
+    try {
+      const response = await api.get<DoctorDailyRevenuesDto>(
+        `/owner/stats/doctor/revenue?doctorId=${docId}`,
+      );
+      setDoctorRevenues(response.entries);
+    } catch (error) {
+      console.error('Error fetching doctor revenues:', error);
+    }
+  };
 
   const selectedDoctorName = useMemo(() => {
-    const doc = doctors.find((d) => d.id === doctorId);
+    const doc = doctors.find((d) => d.id.toString() === doctorId);
     return doc?.name || 'Лікар';
-  }, [doctorId]);
+  }, [doctorId, doctors]);
 
   return (
     <div className="auth-body">
@@ -506,18 +512,19 @@ const Statistics: React.FC = () => {
             className="stat-chart-box"
             style={{ backgroundColor: '#d8d7f6', padding: '1rem' }}
           >
-            <h2>Статистика оглянутих пацієнтів</h2>
-            <DailyBarChart />
+            <h2>Статистика оглянутих пацієнтів (за тиждень)</h2>
+            <DailyBarChart data={weeklyStats} />
           </div>
           <div
             className="stat-chart-box"
             style={{ backgroundColor: '#e6ffbd', padding: '1rem' }}
           >
-            <h2>Кількість оглянутих клієнтів за поточний день</h2>
-            <HourlyLineChart />
+            <h2>Кількість оглянутих клієнтів за поточний день (накопичено)</h2>
+            <HourlyLineChart data={todayCumulate} />
           </div>
         </div>
 
+        {/* 2) Doctor selection */}
         <div className="doctor-select-row" style={{ marginTop: '1rem' }}>
           <label htmlFor="doctor-select" className="doctor-select-label">
             Лікар:
@@ -536,6 +543,7 @@ const Statistics: React.FC = () => {
           </select>
         </div>
 
+        {/* 3) Doctor-specific charts */}
         <div
           className="chart-container"
           style={{
@@ -551,7 +559,7 @@ const Statistics: React.FC = () => {
               <br />
               {selectedDoctorName}
             </h2>
-            <DoctorPatientsBarChart doctorId={doctorId} />
+            <DoctorPatientsBarChart data={doctorCounts} />
           </div>
           <div className="stat-chart-box">
             <h2 style={{ textAlign: 'left' }}>
@@ -559,7 +567,7 @@ const Statistics: React.FC = () => {
               <br />
               {selectedDoctorName}
             </h2>
-            <DoctorRevenueBarChart doctorId={doctorId} />
+            <DoctorRevenueBarChart data={doctorRevenues} />
           </div>
         </div>
       </div>

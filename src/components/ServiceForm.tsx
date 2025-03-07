@@ -10,6 +10,8 @@ import {
   newServiceSchema,
   ServiceFormProps,
 } from '../types/services';
+import api from '../service/axiosUtils';
+import { StatusResponseDto } from '../types/common';
 
 const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const {
@@ -26,7 +28,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const onSubmit = async (data: NewServiceDto) => {
     console.log('New Service DTO:', data);
     try {
-      // TODO: Implement API call to send new service data to the server.
+      await api.post<StatusResponseDto, NewServiceDto>('/owner/services', data);
       toast.success('Послугу успішно додано');
     } catch (error) {
       toast.error('Сталася помилка при додаванні послуги');
@@ -51,7 +53,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          Додавання послуги
+          Додавання нової послуги
         </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -64,7 +66,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
         >
           <Input
             type="text"
-            label="Назва послуги"
+            label="Назва"
             inputId="serviceName"
             placeholder="Введіть назву послуги"
             error={errors.serviceName?.message}
@@ -82,7 +84,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
           />
           <Button
             type="primary"
-            text="Додати послугу"
+            text="Зберегти"
             isSubmit={true}
             css={{
               width: 'fit-content',

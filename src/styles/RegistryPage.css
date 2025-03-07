@@ -139,7 +139,7 @@
 
 .registry-table tr:hover {
     cursor: pointer;
-    box-shadow: #595959 1px 1px;
+    background-color: #cce7ff;
 }
 
 .registry-table tbody tr:not(:last-child) td {

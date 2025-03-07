@@ -9,4 +9,5 @@ export interface DecodedJwt {
 export interface JwtPayload {
   id: number;
   role: UserRoles;
+  fullname: string;
 }
