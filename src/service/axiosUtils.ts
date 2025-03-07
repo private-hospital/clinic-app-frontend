@@ -5,21 +5,55 @@ import {
   ErrorResponseDto,
 } from '../types/common';
 
+function getCookie(name: string): string | null {
+  let cookieValue: string | null = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 class ApiClient {
   private axiosInstance: AxiosInstance;
 
   constructor(baseURL: string) {
+    const csrftoken = getCookie('csrftoken') || '';
     this.axiosInstance = axios.create({
       baseURL,
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
       },
+      xsrfCookieName: 'csrftoken',
+      withCredentials: true,
+      xsrfHeaderName: 'X-CSRFToken',
     });
   }
 
   async getBlob(url: string, config?: AxiosRequestConfig): Promise<Blob> {
-    const finalConfig = { ...config, responseType: 'blob' as const };
+    const finalConfig = {
+      ...config,
+      responseType: 'blob' as const,
+      headers: { Accept: 'application/pdf' },
+    };
     const response = await this.axiosInstance.get(url, finalConfig);
+    return response.data;
+  }
+
+  async postToGetBlob(
+    url: string,
+    body: unknown,
+    config?: AxiosRequestConfig,
+  ): Promise<Blob> {
+    const finalConfig = { ...config, responseType: 'blob' as const };
+    const response = await this.axiosInstance.post(url, body, finalConfig);
     return response.data;
   }
 

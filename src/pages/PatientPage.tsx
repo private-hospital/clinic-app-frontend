@@ -94,8 +94,11 @@ const PatientPage = () => {
 
   useEffect(() => {
     fetchPatient();
-    fetchAppointments();
   }, [id]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [id, isAppointmentFormOpened]);
 
   useEffect(() => {
     fetchMedicalRecords();
@@ -144,14 +147,15 @@ const PatientPage = () => {
     toast.success('Пацієнта збережено');
   };
 
-  const formatDate = (timestamp: number): string => {
-    const dateObj = new Date(timestamp);
-
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const year = dateObj.getFullYear();
-
-    return `${day}.${month}.${year}`;
+  const formatDate = (ts: number): string => {
+    if (!ts) return '-';
+    const date = new Date(ts);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hour = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hour}:${mins}`;
   };
 
   const getTypeLabel = (type: MedicalCardRecordDto['type']) => {

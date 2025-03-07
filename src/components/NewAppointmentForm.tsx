@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
@@ -17,11 +17,9 @@ interface AvailableDoctor {
   id: number;
   displayName: string;
 }
-
 interface AvailableTimes {
   entries: string[];
 }
-
 interface RowState {
   doctors: { label: string; value: string }[];
   times: { label: string; value: string }[];
@@ -29,68 +27,38 @@ interface RowState {
   isDateDisabled: boolean;
   isTimeDisabled: boolean;
 }
-
 interface NewAppointmentFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export interface PriceResponseDto {
-  service: string;
-  price: number;
+interface ServicesPricesDto {
+  prices: {
+    service: string;
+    price: number;
+  }[];
 }
 
-export interface PatientDiscountDto {
-  patientId: string;
-  discountPercent: number;
+interface ServicesTotalDto {
+  subtotal: number;
+  discount: number;
+  total: number;
 }
 
-const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
+export default function NewAppointmentForm({
   isOpen,
   onClose,
-}) => {
+}: NewAppointmentFormProps) {
   const [step, setStep] = useState(1);
+
+  const [rowPrices, setRowPrices] = useState<Record<string, number>>({});
+  const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
+
   const [serviceOptions, setServiceOptions] = useState<SelectOption[]>([]);
-  const [discount, setDiscount] = useState<number>(0);
+
   const { id } = useParams<RouteParams>();
-
-  const fetchServiceNames = async () => {
-    try {
-      const response = await api.get<AvailableServicesDto>(
-        '/public/services/names',
-      );
-      const services = response.services.map((s: string): SelectOption => {
-        return {
-          value: s,
-          label: s,
-        };
-      });
-      services.unshift({ value: '', label: '' });
-      setServiceOptions(services);
-    } catch (error) {
-      console.error('Error fetching service names:', error);
-      toast.error('Не вдалось завантажити доступні послуги');
-      setServiceOptions([]);
-    }
-  };
-
-  const getPatientDiscount = async (): Promise<void> => {
-    try {
-      const response = await api.get<PatientDiscountDto>(
-        `/registrar/get-patient-discount?patientId=${id}`,
-      );
-      setDiscount(response.discountPercent);
-    } catch (error) {
-      console.error('Error fetching patient discount:', error);
-      toast.error('Не вдалось отримати інформацію про знижку пацієнта');
-    }
-  };
-
-  useEffect(() => {
-    getPatientDiscount();
-    fetchServiceNames();
-  }, []);
-
   const {
     register,
     handleSubmit,
@@ -99,21 +67,18 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     reset,
   } = useForm<StepOneForm>({
     resolver: zodResolver(stepOneSchema),
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
     defaultValues: {
       appointments: [
         { service: '', doctorId: '', doctorName: '', date: '', time: '' },
       ],
     },
   });
-
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'appointments',
   });
 
-  const [rowsState, setRowsState] = useState<RowState[]>(() =>
+  const [rowsState, setRowsState] = useState<RowState[]>(
     fields.map(() => ({
       doctors: [],
       times: [],
@@ -122,6 +87,88 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
       isTimeDisabled: true,
     })),
   );
+
+  const [stepOneData, setStepOneData] = useState<StepOneForm | null>(null);
+
+  useEffect(() => {
+    const loadServices = () => {
+      api
+        .get<AvailableServicesDto>('/public/services/names')
+        .then((resp) => {
+          const services = resp.services.map((s) => ({
+            value: s,
+            label: s,
+          }));
+          services.unshift({ value: '', label: '' });
+          setServiceOptions(services);
+        })
+        .catch((err) => {
+          console.error('Error fetching services:', err);
+          toast.error('Не вдалось завантажити доступні послуги');
+        });
+    };
+    loadServices();
+  }, []);
+
+  useEffect(() => {
+    if (step !== 2 || !stepOneData) return;
+
+    const serviceNames = stepOneData.appointments.map((a) => a.service);
+
+    api
+      .post<ServicesPricesDto, { services: string[] }>(
+        '/registrar/calculate-cart',
+        { services: serviceNames },
+      )
+      .then((resp) => {
+        const map: Record<string, number> = {};
+        resp.prices.forEach((p) => {
+          map[p.service] = p.price;
+        });
+        setRowPrices(map);
+      })
+      .catch((err) => {
+        console.error('Error fetching itemized prices:', err);
+        toast.error('Не вдалося отримати ціни на послуги');
+      });
+
+    if (id) {
+      api
+        .post<ServicesTotalDto, { services: string[] }>(
+          `/registrar/calculate-totals?patientId=${id}`,
+          { services: serviceNames },
+        )
+        .then((resp) => {
+          setSubtotal(resp.subtotal);
+          setDiscount(resp.discount);
+          setTotal(resp.total);
+        })
+        .catch((err) => {
+          console.error('Error fetching total:', err);
+          toast.error('Не вдалося розрахувати загальну суму');
+        });
+    }
+  }, [step, stepOneData, id]);
+
+  const onSubmitStep1 = (data: StepOneForm) => {
+    setStepOneData(data);
+    setStep(2);
+  };
+
+  const onSubmitStep2 = async () => {
+    if (!stepOneData) return;
+    try {
+      await api.post<StatusResponseDto, StepOneForm>(
+        `/registrar/create-appointments?patientId=${id}`,
+        stepOneData,
+      );
+      toast.success('Записи успішно створено');
+      handleClose();
+    } catch (error) {
+      toast.error('Не вдалося створити записи');
+      console.error(error);
+    }
+  };
 
   const handleAddRow = () => {
     append({ service: '', doctorId: '', doctorName: '', date: '', time: '' });
@@ -144,69 +191,6 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
       newArr.splice(index, 1);
       return newArr;
     });
-  };
-
-  const [stepOneData, setStepOneData] = useState<StepOneForm | null>(null);
-
-  const onSubmitStep1 = async (data: StepOneForm) => {
-    setStepOneData(data);
-    setStep(2);
-  };
-
-  const onSubmitStep2 = async () => {
-    try {
-      await api.post<StatusResponseDto, StepOneForm>(
-        `/api/appointments/create-appointments`,
-        stepOneData!,
-      );
-      toast.success('Записи успішно створено');
-      handleClose();
-    } catch (error) {
-      toast.error('Не вдалося створити записи');
-      console.error(error);
-    }
-  };
-
-  const [subtotal, setSubtotal] = useState(0);
-  const [total, setTotal] = useState(0);
-
-  const getSubtotal = async (): Promise<void> => {
-    let res = 0;
-    for (const el of stepOneData?.appointments ?? []) {
-      res += (await getPriceForAppointment(el.service)) ?? 0;
-    }
-    setSubtotal(res);
-  };
-
-  const getTotal = () => {
-    setTotal((subtotal * discount) / 100);
-  };
-
-  useEffect(() => {
-    getSubtotal();
-  }, [stepOneData]);
-
-  useEffect(() => {
-    getTotal();
-  }, [subtotal]);
-
-  const handleBack = () => {
-    setStep(1);
-  };
-
-  const handleClose = () => {
-    setStep(1);
-    onClose();
-    reset();
-    setRowsState(
-      fields.map(() => ({
-        doctors: [],
-        times: [],
-        isDoctorDisabled: true,
-        isDateDisabled: true,
-        isTimeDisabled: true,
-      })),
-    );
   };
 
   const handleServiceChange = async (index: number, serviceValue: string) => {
@@ -252,7 +236,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
 
     update(index, {
       ...fields[index],
-      doctorId: doctorId,
+      doctorId,
       doctorName: selectedDoctor ? selectedDoctor.label : '',
       date: '',
       time: '',
@@ -280,6 +264,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
       const response = await api.get<AvailableTimes>(
         `/registrar/available-times?doctorId=${doctorId}&date=${dateValue}`,
       );
+      response.entries.unshift('');
 
       setRowsState((prev) => {
         const newArr = [...prev];
@@ -303,20 +288,44 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     update(index, { ...fields[index], time: timeValue });
   };
 
-  async function getPriceForAppointment(
-    serviceName: string,
-  ): Promise<number | null> {
+  const handleBack = () => {
+    setStep(1);
+  };
+
+  const handleClose = () => {
+    setStep(1);
+    onClose();
+    reset();
+    setRowsState(
+      fields.map(() => ({
+        doctors: [],
+        times: [],
+        isDoctorDisabled: true,
+        isDateDisabled: true,
+        isTimeDisabled: true,
+      })),
+    );
+  };
+
+  const handleInvoiceDownload = async () => {
     try {
-      const response = await api.get<PriceResponseDto>(
-        `/registrar/get-price-for-service?service=${encodeURIComponent(serviceName)}`,
+      if (stepOneData == null) throw new Error('null stepOneForm data');
+
+      const response = await api.postToGetBlob(
+        '/registrar/export-invoice',
+        stepOneData,
       );
 
-      return response.price;
+      const fileBlob = new Blob([response], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(fileBlob);
+
+      toast.success('Рахунок успішно завантажено');
+      window.open(fileURL, '_blank');
     } catch (error) {
-      console.error('Error fetching service price:', error);
-      return null;
+      console.error('Error downloading invoice PDF:', error);
+      toast.error('Не вдалось завантажити рахунок');
     }
-  }
+  };
 
   if (!isOpen) return null;
 
@@ -500,14 +509,14 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
               </thead>
               <tbody>
                 {stepOneData.appointments.map((appt, idx) => {
-                  const price = getPriceForAppointment(appt.service);
+                  const price = rowPrices[appt.service] ?? 0;
                   return (
                     <tr key={idx}>
                       <td>{appt.service}</td>
                       <td>{appt.doctorName}</td>
                       <td>{appt.date}</td>
                       <td>{appt.time}</td>
-                      <td>{price}</td>
+                      <td>{price.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -525,7 +534,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                   <td></td>
                   <td></td>
                   <td style={{ textAlign: 'right' }}>Знижка:</td>
-                  <td style={{ textAlign: 'left' }}>40%</td>
+                  <td style={{ textAlign: 'left' }}>{discount}%</td>
                 </tr>
                 <tr>
                   <td></td>
@@ -535,7 +544,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
                     Сума (зі знижкою):
                   </td>
                   <td style={{ textAlign: 'left', fontWeight: 600 }}>
-                    {total.toFixed(2) || 0} грн
+                    {total.toFixed(2)} грн
                   </td>
                 </tr>
               </tbody>
@@ -545,9 +554,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
               type="primary"
               text="Завантажити рахунок"
               isSubmit={false}
-              onClick={() => {
-                toast.success('Рахунок успішно завантажено');
-              }}
+              onClick={handleInvoiceDownload}
               css={{
                 width: 'fit-content',
                 fontSize: '1rem',
@@ -601,6 +608,4 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
       </div>
     </div>
   );
-};
-
-export default NewAppointmentForm;
+}
