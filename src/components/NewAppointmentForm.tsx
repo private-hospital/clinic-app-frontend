@@ -331,7 +331,7 @@ export default function NewAppointmentForm({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content" style={{ width: 'fit-content' }}>
         <button className="modal-close" onClick={handleClose}>
           &times;
         </button>
