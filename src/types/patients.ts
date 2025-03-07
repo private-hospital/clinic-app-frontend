@@ -27,6 +27,9 @@ export const patientEditSchema = z.object({
   sex: z.enum(['MALE', 'FEMALE'], {
     required_error: 'Будь ласка, оберіть стать',
   }),
+  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
+    required_error: 'Будь ласка, оберіть пільгову групу',
+  }),
 });
 
 export type PatientEditFormData = z.infer<typeof patientEditSchema>;
@@ -51,7 +54,9 @@ export const stepTwoSchema = z.object({
 });
 
 export const stepThreeSchema = z.object({
-  benefit: z.string().optional(),
+  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
+    errorMap: () => ({ message: 'Оберіть пільгову групу' }),
+  }),
 });
 
 export const patientsTestData: PatientsRegistryEntryDto[] = [
