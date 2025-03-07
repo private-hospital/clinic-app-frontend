@@ -14,13 +14,11 @@ import api from '../service/axiosUtils';
 const RegistryPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [data, setData] = useState<PatientsRegistryDto | null>(null);
-  const [filteredData, setFilteredData] = useState<
-    PatientsRegistryDto['entries']
-  >([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext)!;
+
   useEffect(() => {
     assertAuth(navigate, authCtx, [UserRoles.REGISTRAR, UserRoles.DOCTOR]);
   }, [navigate, authCtx]);
@@ -31,25 +29,13 @@ const RegistryPage = () => {
 
     if (!data) return;
 
-    const filtered = data.entries.filter((p) =>
-      Object.values(p).some(
-        (value) =>
-          value &&
-          typeof value === 'string' &&
-          value.toLowerCase().includes(query),
-      ),
-    );
-
-    setFilteredData(filtered);
-  };
-
   const fetchData = async () => {
     try {
       const response = await api.get<PatientsRegistryDto>(
-        `/public/registry?p=${page}&q=5&s=${encodeURIComponent(searchQuery)}`,
+        `/public/registry?p=${page}&q=10`,
       );
+      console.log(response);
       setData(response);
-      setFilteredData(response.entries); // Ініціалізуємо відфільтровані дані
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -130,8 +116,8 @@ const RegistryPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((p) => (
+            {data.length > 0 ? (
+              data.map((p) => (
                 <tr onClick={() => navigate(`/patient/${p.id}`)} key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.fullname}</td>

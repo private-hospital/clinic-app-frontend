@@ -156,6 +156,7 @@ const PatientPage = () => {
 
   const onSubmit = async (data: PatientEditFormData) => {
     try {
+      // Приклад: виконуємо PUT (або PATCH) на ендпоінт /public/patient/:id
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/public/patient/${id}`,
         {
