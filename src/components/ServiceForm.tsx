@@ -28,6 +28,15 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const onSubmit = async (data: NewServiceDto) => {
     console.log('New Service DTO:', data);
     try {
+      await api.get<StatusResponseDto>(
+        `/owner/service-exists?name=${encodeURIComponent(data.serviceName)}`,
+      );
+      toast.error('Послуга з такою назвою вже існує');
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+    try {
       await api.post<StatusResponseDto, NewServiceDto>('/owner/services', data);
       toast.success('Послугу успішно додано');
     } catch (error) {

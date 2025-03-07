@@ -88,9 +88,20 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
   };
 
   const onSubmitStep2 = (data: StepTwoData) => {
-    console.log(data);
-    setIsCodeBlocked(true);
-    setStep(3);
+    api
+      .get<StatusResponseDto>(
+        `/public/verify?email=${encodeURIComponent(patientData.email ?? '')}&code=${data.verificationCode}`,
+      )
+      .then((v) => {
+        if (v.status === 'OK') {
+          setIsCodeBlocked(true);
+          setStep(3);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Неправильний код підтвердження');
+      });
   };
 
   const onSubmitStep3 = async (data: StepThreeData) => {
@@ -224,9 +235,9 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
             }}
           >
             <h2>
-              Підтвердження номеру
+              Підтвердження електронної
               <br />
-              телефону
+              адреси
             </h2>
             <Input
               type="number"
@@ -257,19 +268,30 @@ const PatientRegistrationForm: React.FC<PatientRegistrationFormProps> = ({
                   }}
                   disabled={count > 0}
                   onClick={() => {
-                    setCount(30);
-                    intervalRef.current = setInterval(() => {
-                      setCount((prevCount) => {
-                        if (prevCount <= 1) {
-                          if (intervalRef.current) {
-                            clearInterval(intervalRef.current);
-                          }
-                          return 0;
-                        }
-                        return prevCount - 1;
+                    api
+                      .get<StatusResponseDto>(
+                        `/public/send-verification?email=${encodeURIComponent(patientData.email ?? '')}`,
+                      )
+                      .then((v) => {
+                        console.log(v.status);
+                        toast.success('Код успішно відправлено');
+                        setCount(30);
+                        intervalRef.current = setInterval(() => {
+                          setCount((prevCount) => {
+                            if (prevCount <= 1) {
+                              if (intervalRef.current) {
+                                clearInterval(intervalRef.current);
+                              }
+                              return 0;
+                            }
+                            return prevCount - 1;
+                          });
+                        }, 1000);
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        toast.error('Не вдалось відправити код');
                       });
-                    }, 1000);
-                    toast.success('Код успішно відправлено!');
                   }}
                 />
               )}
