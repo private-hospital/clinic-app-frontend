@@ -374,7 +374,7 @@ export default function NewAppointmentForm({
                             handleServiceChange(index, e.target.value)
                           }
                           disabled={false}
-                          css={{ fontSize: '1rem' }}
+                          css={{ fontSize: '1rem', height: '3.2rem' }}
                         />
                       </td>
 
@@ -395,7 +395,11 @@ export default function NewAppointmentForm({
                             handleDoctorChange(index, e.target.value)
                           }
                           disabled={rowState.isDoctorDisabled}
-                          css={{ fontSize: '1rem', maxWidth: '300px' }}
+                          css={{
+                            fontSize: '1rem',
+                            maxWidth: '300px',
+                            height: '3.2rem',
+                          }}
                         />
                       </td>
 
@@ -414,7 +418,11 @@ export default function NewAppointmentForm({
                             handleDateChange(index, e.target.value)
                           }
                           disabled={rowState.isDateDisabled}
-                          css={{ fontSize: '1rem' }}
+                          css={{
+                            fontSize: '1rem',
+                            height: '3.2rem',
+                            boxSizing: 'border-box',
+                          }}
                         />
                       </td>
 
@@ -435,7 +443,7 @@ export default function NewAppointmentForm({
                           }
                           options={rowState.times}
                           disabled={rowState.isTimeDisabled}
-                          css={{ fontSize: '1rem' }}
+                          css={{ fontSize: '1rem', height: '3.2rem' }}
                         />
                       </td>
 
@@ -447,7 +455,7 @@ export default function NewAppointmentForm({
                           isSubmit={false}
                           css={{
                             fontSize: '1rem',
-                            height: '3.5rem',
+                            height: '3.2rem',
                             width: '100%',
                             paddingLeft: '2rem',
                             paddingRight: '2rem',
