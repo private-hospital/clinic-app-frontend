@@ -44,9 +44,6 @@ export const stepOneSchema = z.object({
   sex: z.enum(['MALE', 'FEMALE'], {
     errorMap: () => ({ message: 'Оберіть стать' }),
   }),
-  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
-    errorMap: () => ({ message: 'Оберіть пільгову групу' }),
-  }),
 });
 
 export const stepTwoSchema = z.object({
@@ -57,7 +54,9 @@ export const stepTwoSchema = z.object({
 });
 
 export const stepThreeSchema = z.object({
-  benefit: z.string().optional(),
+  benefit: z.enum(['military', 'elderly', 'disabled', 'staff_family'], {
+    errorMap: () => ({ message: 'Оберіть пільгову групу' }),
+  }),
 });
 
 export const patientsTestData: PatientsRegistryEntryDto[] = [
