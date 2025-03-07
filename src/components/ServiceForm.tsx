@@ -28,11 +28,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ isOpen, onClose }) => {
   const onSubmit = async (data: NewServiceDto) => {
     console.log('New Service DTO:', data);
     try {
-      await api.get<StatusResponseDto>(
+      const { status } = await api.get<StatusResponseDto>(
         `/owner/service-exists?name=${encodeURIComponent(data.serviceName)}`,
       );
-      toast.error('Послуга з такою назвою вже існує');
-      return;
+      if (status === 'EXISTS') {
+        toast.error('Послуга з такою назвою вже існує');
+        return;
+      }
     } catch (error) {
       console.log(error);
     }
