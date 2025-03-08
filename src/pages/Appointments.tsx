@@ -80,7 +80,7 @@ const Appointments = () => {
       <Header />
       <div className="a-registry-holder">
         <div className="a-controls-block">
-          <h1 className="a-page-title">Заплановані огляди</h1>
+          <h1 className="a-page-title">Огляди</h1>
           <div className="a-buttons-holder">
             <Select
               label=""
